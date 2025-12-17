@@ -1,163 +1,159 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import GrainOverlay from "./components/GrainOverlay";
 
-const vertexShader = `
-  attribute vec2 a_position;
-  void main() {
-    gl_Position = vec4(a_position, 0.0, 1.0);
-  }
-`;
+const projects = [
+	{ name: "writer", url: "https://writer.place/" },
+	{ name: "/tip", url: "https://syndicate.slack.tips" },
+	{ name: "ethcall.org", url: "https://ethcall.org" },
+	{ name: "vono", url: "https://vono.dev/" },
+	{ name: "painthead", url: "https://painthead.vercel.app/" },
+];
 
-const fragmentShader = `
-  precision highp float;
-
-  uniform vec2 u_resolution;
-  uniform float u_time;
-
-  // Hash function for grain
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-  }
-
-  void main() {
-    vec2 uv = gl_FragCoord.xy;
-    float t = u_time;
-
-    // Dancing organic waves - horizontal drift with randomness
-    float hDrift = t * 50.0;
-    float n1 = hash(floor(uv * 0.35) + t * 0.08);
-    float n2 = hash(floor(uv * 0.5) + t * 0.12 + 50.0);
-
-    float wave1 = sin((uv.x + hDrift + n1 * 100.0) * 0.005 + t * 1.5) * cos(uv.y * 0.004 - t * 1.2);
-    float wave2 = sin((uv.x + hDrift * 0.7 + n2 * 80.0) * 0.004 + t * 2.0) * cos((uv.x - uv.y) * 0.003 - t * 0.8);
-    float wave3 = sin((uv.x + hDrift * 1.2) * 0.006 + n1 * 2.0 + t * 1.8) * cos(uv.y * 0.005 + t * 1.0);
-
-    float distortion = (wave1 + wave2 * 1.5 + wave3 * 0.8);
-
-    // Softer animated grain
-    float grain = (hash(uv * 0.0002 + fract(t * 60.0)) - 0.5) * 0.05;
-
-    // Lower contrast - tighter range around middle gray
-    float value = 0.5 + distortion * 0.5 + grain;
-    value = clamp(value, 0.1, 0.95);
-
-    gl_FragColor = vec4(vec3(value), 0.7);
-  }
-`;
-
-function createShader(
-	gl: WebGLRenderingContext,
-	type: number,
-	source: string,
-): WebGLShader | null {
-	const shader = gl.createShader(type);
-	if (!shader) return null;
-	gl.shaderSource(shader, source);
-	gl.compileShader(shader);
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		console.error("Shader compile error:", gl.getShaderInfoLog(shader));
-		gl.deleteShader(shader);
-		return null;
-	}
-	return shader;
+function hslToHex(h: number, s: number, l: number): string {
+	s /= 100;
+	l /= 100;
+	const a = s * Math.min(l, 1 - l);
+	const f = (n: number) => {
+		const k = (n + h / 30) % 12;
+		const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+		return Math.round(255 * color)
+			.toString(16)
+			.padStart(2, "0");
+	};
+	return `#${f(0)}${f(8)}${f(4)}`;
 }
 
 export default function Home() {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const [hue, setHue] = useState(280);
+	const [saturation, setSaturation] = useState(70);
+	const [showSliders, setShowSliders] = useState(false);
+
+	// Load from localStorage on mount
+	useEffect(() => {
+		const savedHue = localStorage.getItem("bgHue");
+		const savedSaturation = localStorage.getItem("bgSaturation");
+		if (savedHue) setHue(Number(savedHue));
+		if (savedSaturation) setSaturation(Number(savedSaturation));
+	}, []);
+
+	// Save to localStorage when values change
+	useEffect(() => {
+		localStorage.setItem("bgHue", String(hue));
+		localStorage.setItem("bgSaturation", String(saturation));
+	}, [hue, saturation]);
 
 	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-
-		const gl = canvas.getContext("webgl", {
-			alpha: true,
-			premultipliedAlpha: false,
-		});
-		if (!gl) return;
-
-		const vs = createShader(gl, gl.VERTEX_SHADER, vertexShader);
-		const fs = createShader(gl, gl.FRAGMENT_SHADER, fragmentShader);
-		if (!vs || !fs) return;
-
-		const program = gl.createProgram();
-		if (!program) return;
-		gl.attachShader(program, vs);
-		gl.attachShader(program, fs);
-		gl.linkProgram(program);
-
-		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-			console.error("Program link error:", gl.getProgramInfoLog(program));
-			return;
-		}
-
-		const positionLocation = gl.getAttribLocation(program, "a_position");
-		const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-		const timeLocation = gl.getUniformLocation(program, "u_time");
-
-		const positionBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-		gl.bufferData(
-			gl.ARRAY_BUFFER,
-			new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
-			gl.STATIC_DRAW,
-		);
-
-		gl.enable(gl.BLEND);
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-		const resize = () => {
-			const dpr = Math.min(window.devicePixelRatio || 1, 2);
-			canvas.width = window.innerWidth * dpr;
-			canvas.height = window.innerHeight * dpr;
-			canvas.style.width = `${window.innerWidth}px`;
-			canvas.style.height = `${window.innerHeight}px`;
-			gl.viewport(0, 0, canvas.width, canvas.height);
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "c" || e.key === "C") {
+				setShowSliders((prev) => !prev);
+			}
 		};
-		resize();
-		window.addEventListener("resize", resize);
-
-		let animationId: number;
-		const startTime = Date.now();
-
-		const render = () => {
-			const time = (Date.now() - startTime) / 1000;
-
-			gl.useProgram(program);
-			gl.enableVertexAttribArray(positionLocation);
-			gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-			gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-			gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-			gl.uniform1f(timeLocation, time);
-
-			gl.drawArrays(gl.TRIANGLES, 0, 6);
-			animationId = requestAnimationFrame(render);
-		};
-
-		render();
-
-		return () => {
-			window.removeEventListener("resize", resize);
-			cancelAnimationFrame(animationId);
-			gl.deleteProgram(program);
-			gl.deleteShader(vs);
-			gl.deleteShader(fs);
-		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, []);
+
+	// Complementary color: offset hue by 180 degrees for maximum contrast
+	const textColor = `hsl(${(hue + 180) % 360}, 100%, 75%)`;
+	const textColorHover = `hsl(${(hue + 180) % 360}, 100%, 45%)`;
+	const hexColor = hslToHex(hue, saturation, 50);
 
 	return (
 		<>
-			{/* Blurred background image */}
 			<div
-				className="fixed inset-0 bg-cover bg-center bg-no-repeat blur-lg scale-110"
-				style={{ backgroundImage: "url('/caleb-guy-bg.png')" }}
+				className="fixed inset-0"
+				style={{ backgroundColor: `hsl(${hue}, ${saturation}%, 50%)` }}
 			/>
-			{/* Animated noise overlay */}
-			<canvas
-				ref={canvasRef}
-				className="fixed inset-0 pointer-events-none mix-blend-overlay"
-			/>
+			<GrainOverlay />
+			<div className="relative flex flex-col items-start justify-between min-h-screen">
+				<section>
+					<div className="flex flex-col items-start">
+						{projects.map((project) => (
+							<Link
+								target="_blank"
+								rel="noopener noreferrer"
+								href={project.url}
+								key={project.name}
+								className="text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--hover-color)!"
+								style={
+									{
+										color: textColor,
+										fontFamily: "'Merchant Copy', monospace",
+										"--hover-color": textColorHover,
+									} as React.CSSProperties
+								}
+							>
+								{project.name}
+							</Link>
+						))}
+					</div>
+				</section>
+				{showSliders && (
+					<div className="fixed bottom-4 left-4 right-4 flex flex-col gap-2">
+						<div className="flex items-center gap-4">
+							<input
+								type="range"
+								min="0"
+								max="360"
+								value={hue}
+								onChange={(e) => setHue(Number(e.target.value))}
+								className="flex-1 h-3 appearance-none cursor-pointer"
+								style={{
+									background: `linear-gradient(to right,
+									hsl(0, ${saturation}%, 50%),
+									hsl(60, ${saturation}%, 50%),
+									hsl(120, ${saturation}%, 50%),
+									hsl(180, ${saturation}%, 50%),
+									hsl(240, ${saturation}%, 50%),
+									hsl(300, ${saturation}%, 50%),
+									hsl(360, ${saturation}%, 50%)
+								)`,
+								}}
+							/>
+							<span
+								className="font-mono text-sm w-20"
+								style={{ color: textColor }}
+							>
+								{hexColor}
+							</span>
+						</div>
+						<div className="flex items-center gap-4">
+							<input
+								type="range"
+								min="0"
+								max="100"
+								value={saturation}
+								onChange={(e) => setSaturation(Number(e.target.value))}
+								className="flex-1 h-3 appearance-none cursor-pointer"
+								style={{
+									background: `linear-gradient(to right,
+									hsl(${hue}, 0%, 50%),
+									hsl(${hue}, 50%, 50%),
+									hsl(${hue}, 100%, 50%)
+								)`,
+								}}
+							/>
+							<span
+								className="font-mono text-sm w-20"
+								style={{ color: textColor }}
+							>
+								{saturation}%
+							</span>
+						</div>
+					</div>
+				)}
+				<span
+					className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug"
+					style={{
+						color: textColor,
+						fontFamily: "'Merchant Copy', monospace",
+					}}
+				>
+					calebguy
+				</span>
+			</div>
 		</>
 	);
 }

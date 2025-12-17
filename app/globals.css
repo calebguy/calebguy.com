@@ -1,8 +1,21 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Merchant Copy";
+  src: url("/fonts/Merchant Copy Doublesize.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* #d95926 this one is good */
+/* #aa7d55 this one is really good */
+/* #9c7e63 this one is really really good */
+
+/* #2e77d1 neva's favorite */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #adee5d;
+  --foreground: #423d2c;
 }
 
 @theme inline {
@@ -14,13 +27,20 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --background: #423d2c;
+  --foreground: #adee5d;
   }
+}
+
+html,
+body {
+  height: 100dvh;
+  overflow: hidden;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  padding: 1rem;
 }
