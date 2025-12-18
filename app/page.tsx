@@ -29,7 +29,6 @@ function _hslToHex(h: number, s: number, l: number): string {
 export default function Home() {
 	const [hue, setHue] = useState(280);
 	const [saturation, setSaturation] = useState(70);
-	const [loaded, setLoaded] = useState(false);
 
 	// Touch drag for color picking
 	const touchStart = useRef<{
@@ -59,7 +58,6 @@ export default function Home() {
 		const bgColor = `hsl(${hue}, ${saturation}%, 50%)`;
 		document.documentElement.style.backgroundColor = bgColor;
 		document.body.style.backgroundColor = bgColor;
-
 	}, [hue, saturation]);
 
 	const handleTouchStart = (e: React.TouchEvent) => {
@@ -137,11 +135,6 @@ export default function Home() {
 
 	return (
 		<>
-			{/* Black overlay that fades out after load */}
-			<div
-				className="fixed inset-0 bg-black z-50 pointer-events-none transition-opacity duration-500"
-				style={{ opacity: loaded ? 0 : 1 }}
-			/>
 			<div
 				className="fixed inset-0"
 				style={{ backgroundColor: `hsl(${hue}, ${saturation}%, 50%)` }}
