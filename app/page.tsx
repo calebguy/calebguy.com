@@ -34,7 +34,7 @@ export default function Home() {
 
 			<Link
 				href="/about"
-				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors"
+				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
 				style={{
 					color: "var(--text-color)",
 					fontFamily: "'Merchant Copy', monospace",
