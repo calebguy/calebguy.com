@@ -38,12 +38,29 @@ export default function Home() {
 		saturation: number;
 	} | null>(null);
 
-	// Load from localStorage on mount
+	// Load from localStorage on mount and immediately apply
 	useEffect(() => {
 		const savedHue = localStorage.getItem("bgHue");
 		const savedSaturation = localStorage.getItem("bgSaturation");
-		if (savedHue) setHue(Number(savedHue));
-		if (savedSaturation) setSaturation(Number(savedSaturation));
+		const h = savedHue ? Number(savedHue) : hue;
+		const s = savedSaturation ? Number(savedSaturation) : saturation;
+
+		if (savedHue) setHue(h);
+		if (savedSaturation) setSaturation(s);
+
+		// Immediately apply to prevent flash of default color
+		const bgColor = `hsl(${h}, ${s}%, 50%)`;
+		document.documentElement.style.backgroundColor = bgColor;
+		document.body.style.backgroundColor = bgColor;
+
+		// Also update theme-color immediately
+		let metaTheme = document.querySelector('meta[name="theme-color"]');
+		if (!metaTheme) {
+			metaTheme = document.createElement("meta");
+			metaTheme.setAttribute("name", "theme-color");
+			document.head.appendChild(metaTheme);
+		}
+		metaTheme.setAttribute("content", hslToHex(h, s, 50));
 	}, []);
 
 	// Save to localStorage and update body/theme color when values change
@@ -51,8 +68,9 @@ export default function Home() {
 		localStorage.setItem("bgHue", String(hue));
 		localStorage.setItem("bgSaturation", String(saturation));
 
-		// Update body background for safe areas
+		// Update html/body background for safe areas
 		const bgColor = `hsl(${hue}, ${saturation}%, 50%)`;
+		document.documentElement.style.backgroundColor = bgColor;
 		document.body.style.backgroundColor = bgColor;
 
 		// Update theme-color meta tag for browser chrome
