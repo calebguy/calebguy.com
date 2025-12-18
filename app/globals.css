@@ -35,6 +35,8 @@
 html,
 body {
   height: 100dvh;
+  min-height: 100dvh;
+  max-height: 100dvh;
   overflow: hidden;
 }
 
@@ -43,8 +45,8 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   padding: 1rem;
-  padding-top: calc(1rem + env(safe-area-inset-top));
+  /* padding-top: calc(1rem + env(safe-area-inset-top));
   padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   padding-left: calc(1rem + env(safe-area-inset-left));
-  padding-right: calc(1rem + env(safe-area-inset-right));
+  padding-right: calc(1rem + env(safe-area-inset-right)); */
 }

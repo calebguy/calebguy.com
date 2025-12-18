@@ -14,12 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: "calebguy",
-	description: "things by a guy named caleb guy",
-	viewport: {
-		width: "device-width",
-		initialScale: 1,
-		viewportFit: "cover",
-	},
+	description: "a portfolio of things",
 };
 
 export default function RootLayout({

@@ -38,29 +38,12 @@ export default function Home() {
 		saturation: number;
 	} | null>(null);
 
-	// Load from localStorage on mount and immediately apply
+	// Load from localStorage on mount
 	useEffect(() => {
 		const savedHue = localStorage.getItem("bgHue");
 		const savedSaturation = localStorage.getItem("bgSaturation");
-		const h = savedHue ? Number(savedHue) : hue;
-		const s = savedSaturation ? Number(savedSaturation) : saturation;
-
-		if (savedHue) setHue(h);
-		if (savedSaturation) setSaturation(s);
-
-		// Immediately apply to prevent flash of default color
-		const bgColor = `hsl(${h}, ${s}%, 50%)`;
-		document.documentElement.style.backgroundColor = bgColor;
-		document.body.style.backgroundColor = bgColor;
-
-		// Also update theme-color immediately
-		let metaTheme = document.querySelector('meta[name="theme-color"]');
-		if (!metaTheme) {
-			metaTheme = document.createElement("meta");
-			metaTheme.setAttribute("name", "theme-color");
-			document.head.appendChild(metaTheme);
-		}
-		metaTheme.setAttribute("content", hslToHex(h, s, 50));
+		if (savedHue) setHue(Number(savedHue));
+		if (savedSaturation) setSaturation(Number(savedSaturation));
 	}, []);
 
 	// Save to localStorage and update body/theme color when values change
@@ -68,7 +51,7 @@ export default function Home() {
 		localStorage.setItem("bgHue", String(hue));
 		localStorage.setItem("bgSaturation", String(saturation));
 
-		// Update html/body background for safe areas
+		// Update body background for safe areas
 		const bgColor = `hsl(${hue}, ${saturation}%, 50%)`;
 		document.documentElement.style.backgroundColor = bgColor;
 		document.body.style.backgroundColor = bgColor;
@@ -82,7 +65,6 @@ export default function Home() {
 		}
 		metaTheme.setAttribute("content", hslToHex(hue, saturation, 50));
 	}, [hue, saturation]);
-
 
 	const handleTouchStart = (e: React.TouchEvent) => {
 		const touch = e.touches[0];
@@ -160,12 +142,12 @@ export default function Home() {
 	return (
 		<>
 			<div
-				className="fixed inset-0"
+				className="fixed inset-0 h-dvh"
 				style={{ backgroundColor: `hsl(${hue}, ${saturation}%, 50%)` }}
 			/>
 			<GrainOverlay />
 			<div
-				className="relative flex flex-col items-start justify-between min-h-screen touch-none"
+				className="relative flex flex-col items-start justify-between h-dvh touch-none"
 				onTouchStart={handleTouchStart}
 				onTouchMove={handleTouchMove}
 				onTouchEnd={handleTouchEnd}
@@ -182,7 +164,7 @@ export default function Home() {
 								rel="noopener noreferrer"
 								href={project.url}
 								key={project.name}
-								className="text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--hover-color)!"
+								className="text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--hover-color)! select-none"
 								style={
 									{
 										color: textColor,
@@ -196,8 +178,9 @@ export default function Home() {
 						))}
 					</div>
 				</section>
+
 				<span
-					className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug"
+					className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none"
 					style={{
 						color: textColor,
 						fontFamily: "'Merchant Copy', monospace",
