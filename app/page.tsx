@@ -5,6 +5,7 @@ const projects = [
 	{ name: "/tip", url: "https://syndicate.slack.tips" },
 	{ name: "ethcall.org", url: "https://ethcall.org" },
 	{ name: "vono", url: "https://vono.dev/" },
+	{ name: "doge pixels", url: "https://pixels.ownthedoge.com/" },
 	{ name: "painthead", url: "https://painthead.vercel.app/" },
 ];
 
@@ -33,7 +34,7 @@ export default function Home() {
 
 			<Link
 				href="/about"
-				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none"
+				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors"
 				style={{
 					color: "var(--text-color)",
 					fontFamily: "'Merchant Copy', monospace",

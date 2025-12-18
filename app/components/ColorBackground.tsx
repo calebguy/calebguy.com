@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import GrainOverlay from "./GrainOverlay";
 
 export default function ColorBackground({ children }: { children: ReactNode }) {
