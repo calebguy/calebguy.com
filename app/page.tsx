@@ -56,14 +56,6 @@ export default function Home() {
 		document.documentElement.style.backgroundColor = bgColor;
 		document.body.style.backgroundColor = bgColor;
 
-		// Update theme-color meta tag for browser chrome (iOS status bar)
-		let metaTheme = document.querySelector('meta[name="theme-color"]');
-		if (!metaTheme) {
-			metaTheme = document.createElement("meta");
-			metaTheme.setAttribute("name", "theme-color");
-			document.head.appendChild(metaTheme);
-		}
-		metaTheme.setAttribute("content", bgColor);
 	}, [hue, saturation]);
 
 	const handleTouchStart = (e: React.TouchEvent) => {
@@ -156,7 +148,7 @@ export default function Home() {
 				onMouseUp={handleMouseUp}
 				onMouseLeave={handleMouseUp}
 			>
-				<section>
+				<section id="content">
 					<div className="flex flex-col items-start">
 						{projects.map((project) => (
 							<Link
