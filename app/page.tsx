@@ -46,7 +46,9 @@ export default function Home() {
 		if (savedSaturation) setSaturation(Number(savedSaturation));
 
 		// Small delay to ensure colors are applied before fade-in
-		setTimeout(() => setLoaded(true), 50);
+		setTimeout(() => {
+			document.body.style.opacity = "1";
+		}, 50);
 	}, []);
 
 	// Save to localStorage and update body/theme color when values change
