@@ -7,12 +7,6 @@
   font-style: normal;
 }
 
-/* #d95926 this one is good */
-/* #aa7d55 this one is really good */
-/* #9c7e63 this one is really really good */
-
-/* #2e77d1 neva's favorite */
-
 :root {
   --background: #adee5d;
   --foreground: #423d2c;
@@ -34,9 +28,9 @@
 
 html,
 body {
-  height: 100dvh;
-  min-height: 100dvh;
-  max-height: 100dvh;
+  /* height: 100dvh; */
+  /* min-height: 100dvh; */
+  /* max-height: 100dvh; */
   overflow: hidden;
 }
 
@@ -45,8 +39,8 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   padding: 1rem;
-  /* padding-top: calc(1rem + env(safe-area-inset-top));
+  padding-top: calc(1rem + env(safe-area-inset-top));
   padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   padding-left: calc(1rem + env(safe-area-inset-left));
-  padding-right: calc(1rem + env(safe-area-inset-right)); */
+  padding-right: calc(1rem + env(safe-area-inset-right));
 }

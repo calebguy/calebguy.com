@@ -12,7 +12,7 @@ const projects = [
 	{ name: "painthead", url: "https://painthead.vercel.app/" },
 ];
 
-function hslToHex(h: number, s: number, l: number): string {
+function _hslToHex(h: number, s: number, l: number): string {
 	s /= 100;
 	l /= 100;
 	const a = s * Math.min(l, 1 - l);
@@ -56,14 +56,14 @@ export default function Home() {
 		document.documentElement.style.backgroundColor = bgColor;
 		document.body.style.backgroundColor = bgColor;
 
-		// Update theme-color meta tag for browser chrome
+		// Update theme-color meta tag for browser chrome (iOS status bar)
 		let metaTheme = document.querySelector('meta[name="theme-color"]');
 		if (!metaTheme) {
 			metaTheme = document.createElement("meta");
 			metaTheme.setAttribute("name", "theme-color");
 			document.head.appendChild(metaTheme);
 		}
-		metaTheme.setAttribute("content", hslToHex(hue, saturation, 50));
+		metaTheme.setAttribute("content", bgColor);
 	}, [hue, saturation]);
 
 	const handleTouchStart = (e: React.TouchEvent) => {
@@ -142,12 +142,12 @@ export default function Home() {
 	return (
 		<>
 			<div
-				className="fixed inset-0 h-dvh"
+				className="fixed inset-0"
 				style={{ backgroundColor: `hsl(${hue}, ${saturation}%, 50%)` }}
 			/>
 			<GrainOverlay />
 			<div
-				className="relative flex flex-col items-start justify-between h-dvh touch-none"
+				className="relative flex flex-col items-start justify-between min-h-screen touch-none"
 				onTouchStart={handleTouchStart}
 				onTouchMove={handleTouchMove}
 				onTouchEnd={handleTouchEnd}
