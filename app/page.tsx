@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GrainOverlay from "./components/GrainOverlay";
 
 const projects = [
@@ -29,7 +29,14 @@ function hslToHex(h: number, s: number, l: number): string {
 export default function Home() {
 	const [hue, setHue] = useState(280);
 	const [saturation, setSaturation] = useState(70);
-	const [showSliders, setShowSliders] = useState(false);
+
+	// Touch drag for color picking
+	const touchStart = useRef<{
+		x: number;
+		y: number;
+		hue: number;
+		saturation: number;
+	} | null>(null);
 
 	// Load from localStorage on mount
 	useEffect(() => {
@@ -39,26 +46,98 @@ export default function Home() {
 		if (savedSaturation) setSaturation(Number(savedSaturation));
 	}, []);
 
-	// Save to localStorage when values change
+	// Save to localStorage and update body/theme color when values change
 	useEffect(() => {
 		localStorage.setItem("bgHue", String(hue));
 		localStorage.setItem("bgSaturation", String(saturation));
+
+		// Update body background for safe areas
+		const bgColor = `hsl(${hue}, ${saturation}%, 50%)`;
+		document.body.style.backgroundColor = bgColor;
+
+		// Update theme-color meta tag for browser chrome
+		let metaTheme = document.querySelector('meta[name="theme-color"]');
+		if (!metaTheme) {
+			metaTheme = document.createElement("meta");
+			metaTheme.setAttribute("name", "theme-color");
+			document.head.appendChild(metaTheme);
+		}
+		metaTheme.setAttribute("content", hslToHex(hue, saturation, 50));
 	}, [hue, saturation]);
 
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "c" || e.key === "C") {
-				setShowSliders((prev) => !prev);
-			}
+
+	const handleTouchStart = (e: React.TouchEvent) => {
+		const touch = e.touches[0];
+		touchStart.current = {
+			x: touch.clientX,
+			y: touch.clientY,
+			hue,
+			saturation,
 		};
-		window.addEventListener("keydown", handleKeyDown);
-		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, []);
+	};
+
+	const handleTouchMove = (e: React.TouchEvent) => {
+		if (!touchStart.current) return;
+		const touch = e.touches[0];
+		const deltaX = touch.clientX - touchStart.current.x;
+		const deltaY = touch.clientY - touchStart.current.y;
+
+		// Horizontal drag changes hue (full screen width = 360 degrees)
+		const newHue =
+			(touchStart.current.hue + (deltaX / window.innerWidth) * 360 + 360) % 360;
+		setHue(Math.round(newHue));
+
+		// Vertical drag changes saturation (full screen height = 100%)
+		const newSaturation = Math.max(
+			0,
+			Math.min(
+				100,
+				touchStart.current.saturation - (deltaY / window.innerHeight) * 100,
+			),
+		);
+		setSaturation(Math.round(newSaturation));
+	};
+
+	const handleTouchEnd = () => {
+		touchStart.current = null;
+	};
+
+	// Mouse drag for color picking (desktop)
+	const handleMouseDown = (e: React.MouseEvent) => {
+		touchStart.current = {
+			x: e.clientX,
+			y: e.clientY,
+			hue,
+			saturation,
+		};
+	};
+
+	const handleMouseMove = (e: React.MouseEvent) => {
+		if (!touchStart.current) return;
+		const deltaX = e.clientX - touchStart.current.x;
+		const deltaY = e.clientY - touchStart.current.y;
+
+		const newHue =
+			(touchStart.current.hue + (deltaX / window.innerWidth) * 360 + 360) % 360;
+		setHue(Math.round(newHue));
+
+		const newSaturation = Math.max(
+			0,
+			Math.min(
+				100,
+				touchStart.current.saturation - (deltaY / window.innerHeight) * 100,
+			),
+		);
+		setSaturation(Math.round(newSaturation));
+	};
+
+	const handleMouseUp = () => {
+		touchStart.current = null;
+	};
 
 	// Complementary color: offset hue by 180 degrees for maximum contrast
 	const textColor = `hsl(${(hue + 180) % 360}, 100%, 75%)`;
 	const textColorHover = `hsl(${(hue + 180) % 360}, 100%, 45%)`;
-	const hexColor = hslToHex(hue, saturation, 50);
 
 	return (
 		<>
@@ -67,7 +146,16 @@ export default function Home() {
 				style={{ backgroundColor: `hsl(${hue}, ${saturation}%, 50%)` }}
 			/>
 			<GrainOverlay />
-			<div className="relative flex flex-col items-start justify-between min-h-screen">
+			<div
+				className="relative flex flex-col items-start justify-between min-h-screen touch-none"
+				onTouchStart={handleTouchStart}
+				onTouchMove={handleTouchMove}
+				onTouchEnd={handleTouchEnd}
+				onMouseDown={handleMouseDown}
+				onMouseMove={handleMouseMove}
+				onMouseUp={handleMouseUp}
+				onMouseLeave={handleMouseUp}
+			>
 				<section>
 					<div className="flex flex-col items-start">
 						{projects.map((project) => (
@@ -90,60 +178,6 @@ export default function Home() {
 						))}
 					</div>
 				</section>
-				{showSliders && (
-					<div className="fixed bottom-4 left-4 right-4 flex flex-col gap-2">
-						<div className="flex items-center gap-4">
-							<input
-								type="range"
-								min="0"
-								max="360"
-								value={hue}
-								onChange={(e) => setHue(Number(e.target.value))}
-								className="flex-1 h-3 appearance-none cursor-pointer"
-								style={{
-									background: `linear-gradient(to right,
-									hsl(0, ${saturation}%, 50%),
-									hsl(60, ${saturation}%, 50%),
-									hsl(120, ${saturation}%, 50%),
-									hsl(180, ${saturation}%, 50%),
-									hsl(240, ${saturation}%, 50%),
-									hsl(300, ${saturation}%, 50%),
-									hsl(360, ${saturation}%, 50%)
-								)`,
-								}}
-							/>
-							<span
-								className="font-mono text-sm w-20"
-								style={{ color: textColor }}
-							>
-								{hexColor}
-							</span>
-						</div>
-						<div className="flex items-center gap-4">
-							<input
-								type="range"
-								min="0"
-								max="100"
-								value={saturation}
-								onChange={(e) => setSaturation(Number(e.target.value))}
-								className="flex-1 h-3 appearance-none cursor-pointer"
-								style={{
-									background: `linear-gradient(to right,
-									hsl(${hue}, 0%, 50%),
-									hsl(${hue}, 50%, 50%),
-									hsl(${hue}, 100%, 50%)
-								)`,
-								}}
-							/>
-							<span
-								className="font-mono text-sm w-20"
-								style={{ color: textColor }}
-							>
-								{saturation}%
-							</span>
-						</div>
-					</div>
-				)}
 				<span
 					className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug"
 					style={{
