@@ -17,7 +17,6 @@ export const metadata: Metadata = {
 	description: "a portfolio of things",
 };
 export const viewport: Viewport = {
-	themeColor: "black",
 	width: "device-width",
 	initialScale: 1,
 	viewportFit: "cover",
