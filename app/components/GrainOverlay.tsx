@@ -33,18 +33,20 @@ const fragmentShader = `
     float extraDistortion = 0.0;
 
     // Ripples emanate from drag position
-    if (u_isDragging > 0.5) {
+    if (u_isDragging > 0.001) {
       float dragDist = distance(uv, u_dragPos);
 
+      // Maximum ripple radius in pixels
+      float maxRadius = 1000.0;
+
       // Multiple ripple waves spreading outward
-      float ripple1 = sin(dragDist * 0.03 - t * 8.0) * 0.5;
-      float ripple2 = sin(dragDist * 0.02 - t * 6.0) * 0.3;
-      float ripple3 = sin(dragDist * 0.015 - t * 4.0) * 0.2;
+      float ripple = sin(dragDist * 0.015 - t * 4.0) * 0.2;
 
-      // Fade out ripples over distance
-      float fadeOut = 1.0 / (1.0 + dragDist * 0.002);
+      // Fade out ripples over distance, clamped to maxRadius
+      float normalizedDist = dragDist / maxRadius;
+      float fadeOut = 1.0 - smoothstep(0.0, 1.0, normalizedDist);
 
-      extraDistortion = (ripple1 + ripple2 + ripple3) * fadeOut;
+      extraDistortion = ripple * fadeOut;
     }
 
     // Dancing organic waves - horizontal drift with randomness
@@ -70,9 +72,9 @@ const fragmentShader = `
 `;
 
 export interface DragPosition {
-  x: number;
-  y: number;
-  isDragging: boolean;
+	x: number;
+	y: number;
+	isDragging: boolean;
 }
 
 function createShader(
