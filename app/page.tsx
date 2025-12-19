@@ -57,7 +57,7 @@ const projects = [
 	},
 	{
 		name: "wordplay",
-		url: "https://wordplay.vercel.app/",
+		url: "https://youtu.be/hAwZb4hvRwg",
 		year: 2018,
 		description: "word conglomorator",
 	},
