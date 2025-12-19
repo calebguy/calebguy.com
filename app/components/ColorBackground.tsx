@@ -29,6 +29,28 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		}, 50);
 	}, []);
 
+	// Fix iOS Safari scroll restoration bug
+	useEffect(() => {
+		if (typeof window !== "undefined" && "scrollRestoration" in history) {
+			history.scrollRestoration = "manual";
+		}
+
+		const handleVisibilityChange = () => {
+			if (document.visibilityState === "visible") {
+				const content = document.getElementById("content");
+				if (content) {
+					content.scrollTop = 0;
+				}
+				window.scrollTo(0, 0);
+			}
+		};
+
+		document.addEventListener("visibilitychange", handleVisibilityChange);
+		return () => {
+			document.removeEventListener("visibilitychange", handleVisibilityChange);
+		};
+	}, []);
+
 	// Save to localStorage and update body/theme color when values change
 	useEffect(() => {
 		localStorage.setItem("bgHue", String(hue));
