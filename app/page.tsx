@@ -67,24 +67,28 @@ export default function Home() {
 	return (
 		<div className="flex flex-col items-start justify-between min-h-screen">
 			<section id="content">
-				<div className="flex flex-col items-start">
+				<div className="flex flex-col items-start gap-2 md:gap-0">
 					{projects.map((project) => (
 						<Link
 							target="_blank"
 							rel="noopener noreferrer"
 							href={project.url}
 							key={project.name}
-							className="text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--text-color-hover)! select-none group inline-flex gap-2"
+							className="text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--text-color-hover)! select-none group flex flex-col md:flex-row md:gap-2"
 							style={{
 								color: "var(--text-color)",
 								fontFamily: "'Merchant Copy', monospace",
 							}}
 						>
 							{project.name}
-							<span className="text-3xl hidden group-hover:block self-center italic opacity-65 text-white">
+							<span className="text-xl md:text-3xl md:hidden opacity-65 text-white">
+								<span className="italic">({project.year})</span>{" "}
+								{project.description}
+							</span>
+							<span className="text-3xl hidden md:group-hover:block self-center italic opacity-65 text-white">
 								({project.year})
 							</span>
-							<span className="text-3xl hidden group-hover:block self-center opacity-65 text-white">
+							<span className="text-3xl hidden md:group-hover:block self-center opacity-65 text-white">
 								{project.description}
 							</span>
 						</Link>
