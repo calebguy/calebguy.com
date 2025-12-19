@@ -15,16 +15,38 @@ export default function About() {
 				</div>
 			</section>
 
-			<Link
-				href="/"
-				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none"
+			<div
+				className="fixed bottom-4 right-4 flex gap-4 text-3xl md:text-6xl leading-snug select-none"
 				style={{
-					color: "var(--text-color)",
 					fontFamily: "'Merchant Copy', monospace",
 				}}
 			>
-				work
-			</Link>
+				<a
+					href="https://github.com/calebguy"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+					style={{ color: "var(--text-color)" }}
+				>
+					github
+				</a>
+				<a
+					href="https://x.com/caleb__guy"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+					style={{ color: "var(--text-color)" }}
+				>
+					twitter
+				</a>
+				<Link
+					href="/"
+					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+					style={{ color: "var(--text-color)" }}
+				>
+					work
+				</Link>
+			</div>
 		</div>
 	);
 }
