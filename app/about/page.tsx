@@ -25,8 +25,7 @@ export default function About() {
 					href="https://github.com/calebguy"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
-					style={{ color: "var(--text-color)" }}
+					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
 				>
 					github
 				</a>
@@ -34,8 +33,7 @@ export default function About() {
 					href="https://x.com/caleb__guy"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
-					style={{ color: "var(--text-color)" }}
+					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
 				>
 					twitter
 				</a>
