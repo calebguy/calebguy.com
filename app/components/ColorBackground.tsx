@@ -1,11 +1,12 @@
 "use client";
 
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import GrainOverlay from "./GrainOverlay";
+import GrainOverlay, { type DragPosition } from "./GrainOverlay";
 
 export default function ColorBackground({ children }: { children: ReactNode }) {
 	const [hue, setHue] = useState(280);
 	const [saturation, setSaturation] = useState(70);
+	const [dragPosition, setDragPosition] = useState<DragPosition | null>(null);
 
 	// Touch drag for color picking
 	const touchStart = useRef<{
@@ -79,10 +80,18 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 			),
 		);
 		setSaturation(Math.round(newSaturation));
+
+		// Update drag position for grain effect
+		setDragPosition({
+			x: touch.clientX,
+			y: touch.clientY,
+			isDragging: true,
+		});
 	};
 
 	const handleTouchEnd = () => {
 		touchStart.current = null;
+		setDragPosition(null);
 	};
 
 	// Mouse drag for color picking (desktop)
@@ -112,10 +121,18 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 			),
 		);
 		setSaturation(Math.round(newSaturation));
+
+		// Update drag position for grain effect
+		setDragPosition({
+			x: e.clientX,
+			y: e.clientY,
+			isDragging: true,
+		});
 	};
 
 	const handleMouseUp = () => {
 		touchStart.current = null;
+		setDragPosition(null);
 	};
 
 	return (
@@ -124,7 +141,7 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 				className="fixed inset-0"
 				style={{ backgroundColor: `hsl(${hue}, ${saturation}%, 50%)` }}
 			/>
-			<GrainOverlay />
+			<GrainOverlay dragPosition={dragPosition} />
 			<div
 				className="relative min-h-screen touch-none"
 				onTouchStart={handleTouchStart}
