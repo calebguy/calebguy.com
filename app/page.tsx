@@ -7,6 +7,9 @@ const projects = [
 	{ name: "vono", url: "https://vono.dev/" },
 	{ name: "doge pixels", url: "https://pixels.ownthedoge.com/" },
 	{ name: "painthead", url: "https://painthead.vercel.app/" },
+	{ name: "nebula", url: "https://youtu.be/wSmsm1jLle0" },
+	{ name: "bloonnoise", url: "https://youtu.be/yKZbCIlSwHc" },
+	{ name: "user", url: "https://youtu.be/NBI_6D5yV3c" },
 ];
 
 export default function Home() {
