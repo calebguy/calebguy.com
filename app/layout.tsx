@@ -16,6 +16,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
 	title: "calebguy",
 	description: "a portfolio of things",
+	openGraph: {
+		images: ["/og.png"],
+	},
+	twitter: {
+		card: "summary_large_image",
+		images: ["/og.png"],
+	},
 };
 export const viewport: Viewport = {
 	width: "device-width",
