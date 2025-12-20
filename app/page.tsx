@@ -26,6 +26,12 @@ const projects = [
 		description: "app framework generator",
 	},
 	{
+		name: "wanwan",
+		url: "https://wanwan-roan.vercel.app/",
+		year: 2022,
+		description: "meme competitions for communities",
+	},
+	{
 		name: "doge pixels",
 		url: "https://pixels.ownthedoge.com/",
 		year: 2021,
