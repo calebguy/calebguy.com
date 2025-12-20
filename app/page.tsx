@@ -33,7 +33,7 @@ const projects = [
 	},
 	{
 		name: "nebula",
-		url: "https://youtu.be/wSmsm1jLle0",
+		url: "https://nebula-kappa-rust.vercel.app/",
 		year: 2019,
 		description: "music video game",
 	},
@@ -57,7 +57,7 @@ const projects = [
 	},
 	{
 		name: "wordplay",
-		url: "https://youtu.be/hAwZb4hvRwg",
+		url: "https://wordplay-beta.vercel.app/",
 		year: 2018,
 		description: "word conglomorator",
 	},
