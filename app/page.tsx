@@ -23,19 +23,19 @@ const projects = [
 		name: "vono",
 		url: "https://vono.dev/",
 		year: 2025,
-		description: "onchain toolkit",
+		description: "app framework generator",
 	},
 	{
 		name: "doge pixels",
 		url: "https://pixels.ownthedoge.com/",
 		year: 2021,
-		description: "pixels of The Doge",
+		description: "pixels of Kobosu the Doge",
 	},
 	{
 		name: "nebula",
 		url: "https://nebula-kappa-rust.vercel.app/",
 		year: 2019,
-		description: "music video game",
+		description: "playable music video",
 	},
 	{
 		name: "bloonnoise",
@@ -48,6 +48,12 @@ const projects = [
 		url: "https://youtu.be/NBI_6D5yV3c",
 		year: 2019,
 		description: "interactive phone fear factory",
+	},
+	{
+		name: "decisions",
+		url: "https://decisions-navy.vercel.app/",
+		year: 2019,
+		description: "decision visualization",
 	},
 	{
 		name: "painthead",
