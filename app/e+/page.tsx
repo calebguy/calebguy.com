@@ -17,19 +17,21 @@ export default function EPlus() {
 					<h1 className="text-3xl md:text-6xl leading-snug select-none">e+</h1>
 				</div>
 				<p className="text-xl md:text-3xl mt-4 opacity-65 text-white">
-					Frontend build for e+, an internet image curation platform.
+					Frontend build for{" "}
+					<Link
+						href="https://x.com/ennntropy"
+						className="text-xl md:text-3xl mt-4 opacity-65 md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						@ennntropy
+					</Link>
+					{"'s "}
+					e+, an internet image curation platform.
 				</p>
-				<Link
-					href="https://x.com/ennntropy"
-					className="text-xl md:text-3xl mt-4 opacity-65 md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					@ennntropy
-				</Link>
 			</header>
 
-			<section className="flex flex-col grow md:px-42 gap-8 overflow-y-auto">
+			<section className="flex flex-col grow md:px-42 lg:px-84 gap-8 overflow-y-auto">
 				{images.map((image) => (
 					<div key={image.src} className={`relative ${image.className}`}>
 						<Image
