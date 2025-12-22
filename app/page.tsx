@@ -23,7 +23,7 @@ const projects = [
 		name: "vono",
 		url: "https://vono.dev/",
 		year: 2025,
-		description: "app framework generator",
+		description: "fullstack onchain app framework",
 	},
 	{
 		name: "wanwan",
