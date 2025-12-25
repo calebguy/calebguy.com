@@ -9,7 +9,7 @@ const projects = [
 	},
 	{
 		name: "/tip",
-		url: "https://syndicate.slack.tips",
+		url: "https://slack.tips",
 		year: 2025,
 		description: "onchain slack tips",
 	},
