@@ -86,7 +86,7 @@ export default function Home() {
 		<>
 			<section
 				id="content"
-				className="flex flex-col items-start gap-2 md:gap-0 overflow-y-scroll max-h-dvh"
+				className="flex flex-col items-start gap-2 md:gap-0 overflow-y-auto max-h-dvh"
 			>
 				{projects.map((project) => {
 					const isExternal = project.url.startsWith("http");
