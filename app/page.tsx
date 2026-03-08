@@ -2,6 +2,12 @@ import Link from "next/link";
 
 const projects = [
 	{
+		name: "ascii goggles",
+		url: "https://calebguy.github.io/seeing-ascii/",
+		year: 2026,
+		description: "ascii all I see",
+	},
+	{
 		name: "writer",
 		url: "https://writer.place/",
 		year: 2025,
