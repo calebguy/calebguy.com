@@ -3,9 +3,9 @@ import Link from "next/link";
 const projects = [
 	{
 		name: "ascii goggles",
-		url: "https://calebguy.github.io/seeing-ascii/",
+		url: "https://asciigoggles.calebguy.com",
 		year: 2026,
-		description: "ascii all I see",
+		description: "ascii-vision",
 	},
 	{
 		name: "writer",
