@@ -5,7 +5,7 @@ const projects = [
 		name: "ascii goggles",
 		url: "https://asciigoggles.calebguy.com",
 		year: 2026,
-		description: "ascii-vision",
+		description: "life in ascii",
 	},
 	{
 		name: "writer",
