@@ -223,7 +223,7 @@ function Blank() {
 				fontFamily: "'Merchant Copy', monospace",
 			}}
 		>
-			calebguy
+			calebguy?
 		</Link>
 	);
 }
@@ -245,7 +245,7 @@ function About() {
 			</section>
 
 			<div
-				className="fixed bottom-4 right-4 flex flex-col md:flex-row gap-2 md:gap-4 text-3xl md:text-6xl leading-snug select-none"
+				className="fixed bottom-4 right-4 flex flex-row gap-6 md:gap-10 text-3xl md:text-6xl leading-snug select-none"
 				style={{
 					fontFamily: "'Merchant Copy', monospace",
 				}}
@@ -256,7 +256,7 @@ function About() {
 					rel="noopener noreferrer"
 					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
 				>
-					github
+					gh
 				</a>
 				<a
 					href="https://x.com/caleb__guy"
@@ -264,7 +264,7 @@ function About() {
 					rel="noopener noreferrer"
 					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
 				>
-					twitter
+					x
 				</a>
 				<Link
 					href="/things"
