@@ -160,7 +160,7 @@ function Link({ href, onClick, target, children, ...props }: LinkProps) {
 	);
 }
 
-function Work() {
+function Things() {
 	return (
 		<>
 			<section
@@ -232,15 +232,16 @@ function About() {
 	return (
 		<div className="flex flex-col items-start justify-between min-h-screen">
 			<section id="content">
-				<div
-					className="text-3xl md:text-6xl leading-snug select-none"
+				<Link
+					href="/"
+					className="block text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
 					style={{
 						color: "var(--text-color)",
 						fontFamily: "'Merchant Copy', monospace",
 					}}
 				>
-					calebguy is a human who uses computers
-				</div>
+					calebguy is a human using computers at cloudflare
+				</Link>
 			</section>
 
 			<div
@@ -266,10 +267,10 @@ function About() {
 					twitter
 				</a>
 				<Link
-					href="/work"
+					href="/things"
 					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
 				>
-					work
+					things
 				</Link>
 			</div>
 		</div>
@@ -318,10 +319,10 @@ function EPlus() {
 			</section>
 
 			<Link
-				href="/work"
+				href="/things"
 				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
 			>
-				work
+				things
 			</Link>
 		</div>
 	);
@@ -333,8 +334,8 @@ function Route({ pathname }: { pathname: string }) {
 			return <Blank />;
 		case "/about":
 			return <About />;
-		case "/work":
-			return <Work />;
+		case "/things":
+			return <Things />;
 		case "/e+":
 			return <EPlus />;
 		default:
