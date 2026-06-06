@@ -207,7 +207,7 @@ function Things() {
 					fontFamily: "'Merchant Copy', monospace",
 				}}
 			>
-				calebguy
+				calebguy?
 			</Link>
 		</>
 	);
@@ -240,7 +240,7 @@ function About() {
 						fontFamily: "'Merchant Copy', monospace",
 					}}
 				>
-					calebguy? is a human using computers at cloudflare
+					calebguy is a human using computers at cloudflare
 				</Link>
 			</section>
 
