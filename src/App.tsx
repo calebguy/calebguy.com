@@ -33,12 +33,6 @@ const projects = [
 		description: "http eth_call",
 	},
 	{
-		name: "vono",
-		url: "https://vono.dev/",
-		year: 2025,
-		description: "fullstack onchain app framework",
-	},
-	{
 		name: "e+",
 		url: "/e+",
 		year: 2022,
@@ -99,7 +93,7 @@ const images = [
 	{ src: "/e+/e1.png", alt: "e+ screenshot 1" },
 	{ src: "/e+/e2.png", alt: "grid view" },
 	{ src: "/e+/entropy-the-second-law.png", alt: "upload" },
-	{ src: "/e+/e.png", alt: "e+ logo", className: "w-1/2 md:w-1/4 mx-auto" },
+	{ src: "/e+/e.png", alt: "e+ logo" },
 ];
 
 function getPathname() {
@@ -270,7 +264,7 @@ function About() {
 
 function EPlus() {
 	return (
-		<div className="flex flex-col h-dvh p-4 pb-24">
+		<div className="flex min-h-dvh flex-col p-4 pb-24">
 			<header className="mb-8">
 				<div className="flex items-center gap-4">
 					<h1 className="text-3xl md:text-6xl leading-snug select-none">e+</h1>
@@ -290,9 +284,9 @@ function EPlus() {
 				</p>
 			</header>
 
-			<section className="flex flex-col grow md:px-42 lg:px-84 gap-8 overflow-y-auto">
+			<section className="grid grid-cols-2 gap-4 md:gap-8">
 				{images.map((image) => (
-					<div key={image.src} className={`relative ${image.className ?? ""}`}>
+					<div key={image.src} className="relative">
 						<img
 							src={image.src}
 							alt={image.alt}
