@@ -10,10 +10,11 @@ function readStoredNumber(key: string, fallback: number) {
 }
 
 export default function ColorBackground({ children }: { children: ReactNode }) {
-	const [hue, setHue] = useState(() => readStoredNumber("bgHue", 280));
+	const [hue, setHue] = useState(() => readStoredNumber("bgHue", 30));
 	const [saturation, setSaturation] = useState(() =>
-		readStoredNumber("bgSaturation", 70),
+		readStoredNumber("bgSaturation", 90),
 	);
+	// console.log({ hue, saturation });
 	const [dragPosition, setDragPosition] = useState<DragPosition | null>(null);
 
 	const touchStart = useRef<{
