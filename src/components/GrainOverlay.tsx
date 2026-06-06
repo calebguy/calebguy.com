@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef } from "react";
 
 const vertexShader = `
@@ -20,7 +18,6 @@ const fragmentShader = `
   uniform vec2 u_dragPos;
   uniform float u_isDragging;
 
-  // Hash function for grain
   float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
   }
@@ -32,24 +29,16 @@ const fragmentShader = `
     vec2 grainUV = uv;
     float extraDistortion = 0.0;
 
-    // Ripples emanate from drag position
     if (u_isDragging > 0.001) {
       float dragDist = distance(uv, u_dragPos);
-
-      // Maximum ripple radius in pixels
       float maxRadius = 1000.0;
-
-      // Multiple ripple waves spreading outward
       float ripple = sin(dragDist * 0.015 - t * 4.0) * 0.2;
-
-      // Fade out ripples over distance, clamped to maxRadius
       float normalizedDist = dragDist / maxRadius;
       float fadeOut = 1.0 - smoothstep(0.0, 1.0, normalizedDist);
 
       extraDistortion = ripple * fadeOut;
     }
 
-    // Dancing organic waves - horizontal drift with randomness
     float hDrift = t * 50.0;
     float n1 = hash(floor(grainUV * 0.35) + t * 0.08 + u_seed);
     float n2 = hash(floor(grainUV * 0.5) + t * 0.12 + 50.0 + u_seed);
@@ -59,11 +48,8 @@ const fragmentShader = `
     float wave3 = sin((grainUV.x + hDrift * 1.2) * 0.006 + n1 * 2.0 + t * 1.8) * cos(grainUV.y * 0.005 + t * 1.0);
 
     float distortion = (wave1 + wave2 * 1.5 + wave3 * 0.8) + extraDistortion;
-
-    // Randomized grain - floor creates chunky blocks, u_grainScale is pixel size of each grain block
     float grain = (hash(floor(grainUV / u_grainScale) + fract(t * 60.0)) - 0.5) * u_grainIntensity;
 
-    // Lower contrast - tighter range around middle gray
     float value = 0.5 + distortion * 0.5 + grain;
     value = clamp(value, 0.1, 0.95);
 
@@ -105,7 +91,6 @@ export default function GrainOverlay({ dragPosition }: GrainOverlayProps) {
 		isDragging: false,
 	});
 
-	// Handle drag position updates from parent
 	useEffect(() => {
 		if (!dragPosition) {
 			dragDataRef.current.isDragging = false;
@@ -114,11 +99,10 @@ export default function GrainOverlay({ dragPosition }: GrainOverlayProps) {
 
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-		// Convert to WebGL coordinates (bottom-left origin)
-		const x = dragPosition.x * dpr;
-		const y = (window.innerHeight - dragPosition.y) * dpr;
-
-		dragDataRef.current.pos = [x, y];
+		dragDataRef.current.pos = [
+			dragPosition.x * dpr,
+			(window.innerHeight - dragPosition.y) * dpr,
+		];
 		dragDataRef.current.isDragging = dragPosition.isDragging;
 	}, [dragPosition]);
 
@@ -159,8 +143,6 @@ export default function GrainOverlay({ dragPosition }: GrainOverlayProps) {
 		const dragPosLocation = gl.getUniformLocation(program, "u_dragPos");
 		const isDraggingLocation = gl.getUniformLocation(program, "u_isDragging");
 
-		// Random grain parameters for this page load
-		// grainScale is now pixel size of each grain block (1 = per-pixel, 10 = 10x10 blocks)
 		const grainScale = 1 + Math.random() * 10;
 		const grainIntensity = 0.15 + Math.random() * 0.15;
 		const seed = Math.random() * 100;
@@ -204,7 +186,6 @@ export default function GrainOverlay({ dragPosition }: GrainOverlayProps) {
 			gl.uniform1f(grainIntensityLocation, grainIntensity);
 			gl.uniform1f(seedLocation, seed);
 
-			// Drag uniforms
 			const dragData = dragDataRef.current;
 			gl.uniform2f(dragPosLocation, dragData.pos[0], dragData.pos[1]);
 			gl.uniform1f(isDraggingLocation, dragData.isDragging ? 1.0 : 0.0);
@@ -218,6 +199,7 @@ export default function GrainOverlay({ dragPosition }: GrainOverlayProps) {
 		return () => {
 			window.removeEventListener("resize", resize);
 			cancelAnimationFrame(animationId);
+			gl.deleteBuffer(positionBuffer);
 			gl.deleteProgram(program);
 			gl.deleteShader(vs);
 			gl.deleteShader(fs);

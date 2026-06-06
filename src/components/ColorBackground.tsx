@@ -1,14 +1,21 @@
-"use client";
-
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import GrainOverlay, { type DragPosition } from "./GrainOverlay";
 
+function readStoredNumber(key: string, fallback: number) {
+	const stored = localStorage.getItem(key);
+	if (!stored) return fallback;
+
+	const value = Number(stored);
+	return Number.isFinite(value) ? value : fallback;
+}
+
 export default function ColorBackground({ children }: { children: ReactNode }) {
-	const [hue, setHue] = useState(280);
-	const [saturation, setSaturation] = useState(70);
+	const [hue, setHue] = useState(() => readStoredNumber("bgHue", 280));
+	const [saturation, setSaturation] = useState(() =>
+		readStoredNumber("bgSaturation", 70),
+	);
 	const [dragPosition, setDragPosition] = useState<DragPosition | null>(null);
 
-	// Touch drag for color picking
 	const touchStart = useRef<{
 		x: number;
 		y: number;
@@ -16,22 +23,16 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		saturation: number;
 	} | null>(null);
 
-	// Load from localStorage on mount
 	useEffect(() => {
-		const savedHue = localStorage.getItem("bgHue");
-		const savedSaturation = localStorage.getItem("bgSaturation");
-		if (savedHue) setHue(Number(savedHue));
-		if (savedSaturation) setSaturation(Number(savedSaturation));
-
-		// Small delay to ensure colors are applied before fade-in
-		setTimeout(() => {
+		const timeoutId = window.setTimeout(() => {
 			document.body.style.opacity = "1";
 		}, 50);
+
+		return () => window.clearTimeout(timeoutId);
 	}, []);
 
-	// Fix iOS Safari scroll restoration bug
 	useEffect(() => {
-		if (typeof window !== "undefined" && "scrollRestoration" in history) {
+		if ("scrollRestoration" in history) {
 			history.scrollRestoration = "manual";
 		}
 
@@ -51,17 +52,14 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		};
 	}, []);
 
-	// Save to localStorage and update body/theme color when values change
 	useEffect(() => {
 		localStorage.setItem("bgHue", String(hue));
 		localStorage.setItem("bgSaturation", String(saturation));
 
-		// Update body background for safe areas
 		const bgColor = `hsl(${hue}, ${saturation}%, 50%)`;
 		document.documentElement.style.backgroundColor = bgColor;
 		document.body.style.backgroundColor = bgColor;
 
-		// Update CSS custom properties for child components
 		document.documentElement.style.setProperty(
 			"--text-color",
 			`hsl(${(hue + 180) % 360}, 100%, 75%)`,
@@ -88,12 +86,10 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		const deltaX = touch.clientX - touchStart.current.x;
 		const deltaY = touch.clientY - touchStart.current.y;
 
-		// Horizontal drag changes hue (full screen width = 360 degrees)
 		const newHue =
 			(touchStart.current.hue + (deltaX / window.innerWidth) * 360 + 360) % 360;
 		setHue(Math.round(newHue));
 
-		// Vertical drag changes saturation (full screen height = 100%)
 		const newSaturation = Math.max(
 			0,
 			Math.min(
@@ -103,7 +99,6 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		);
 		setSaturation(Math.round(newSaturation));
 
-		// Update drag position for grain effect
 		setDragPosition({
 			x: touch.clientX,
 			y: touch.clientY,
@@ -116,7 +111,6 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		setDragPosition(null);
 	};
 
-	// Mouse drag for color picking (desktop)
 	const handleMouseDown = (e: React.MouseEvent) => {
 		touchStart.current = {
 			x: e.clientX,
@@ -144,7 +138,6 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		);
 		setSaturation(Math.round(newSaturation));
 
-		// Update drag position for grain effect
 		setDragPosition({
 			x: e.clientX,
 			y: e.clientY,
