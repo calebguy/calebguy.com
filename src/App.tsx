@@ -93,7 +93,6 @@ const images = [
 	{ src: "/e+/e1.png", alt: "e+ screenshot 1" },
 	{ src: "/e+/e2.png", alt: "grid view" },
 	{ src: "/e+/entropy-the-second-law.png", alt: "upload" },
-	{ src: "/e+/e.png", alt: "e+ logo" },
 ];
 
 function getPathname() {
@@ -161,7 +160,7 @@ function Link({ href, onClick, target, children, ...props }: LinkProps) {
 	);
 }
 
-function Home() {
+function Work() {
 	return (
 		<>
 			<section
@@ -186,7 +185,8 @@ function Home() {
 						>
 							{project.name}
 							<span className="text-xl md:text-3xl md:hidden opacity-65 text-white">
-								<span className="italic">({project.year})</span> {project.description}
+								<span className="italic">({project.year})</span>{" "}
+								{project.description}
 							</span>
 							<span className="text-3xl hidden md:group-hover:block self-center italic opacity-65 text-white">
 								({project.year})
@@ -210,6 +210,21 @@ function Home() {
 				calebguy
 			</Link>
 		</>
+	);
+}
+
+function Blank() {
+	return (
+		<Link
+			href="/about"
+			className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+			style={{
+				color: "var(--text-color)",
+				fontFamily: "'Merchant Copy', monospace",
+			}}
+		>
+			calebguy
+		</Link>
 	);
 }
 
@@ -251,9 +266,8 @@ function About() {
 					twitter
 				</a>
 				<Link
-					href="/"
-					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
-					style={{ color: "var(--text-color)" }}
+					href="/work"
+					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
 				>
 					work
 				</Link>
@@ -284,9 +298,12 @@ function EPlus() {
 				</p>
 			</header>
 
-			<section className="grid grid-cols-2 gap-4 md:gap-8">
+			<section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-w-screen-lg mx-auto">
 				{images.map((image) => (
-					<div key={image.src} className="relative">
+					<div
+						key={image.src}
+						className="relative w-full h-auto flex items-center justify-center"
+					>
 						<img
 							src={image.src}
 							alt={image.alt}
@@ -301,7 +318,7 @@ function EPlus() {
 			</section>
 
 			<Link
-				href="/"
+				href="/work"
 				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
 			>
 				work
@@ -312,12 +329,16 @@ function EPlus() {
 
 function Route({ pathname }: { pathname: string }) {
 	switch (pathname) {
+		case "/":
+			return <Blank />;
 		case "/about":
 			return <About />;
+		case "/work":
+			return <Work />;
 		case "/e+":
 			return <EPlus />;
 		default:
-			return <Home />;
+			return <About />;
 	}
 }
 
