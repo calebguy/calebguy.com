@@ -21,12 +21,6 @@ const projects = [
 		description: "write today, forever",
 	},
 	{
-		name: "/tip",
-		url: "https://slack.tips",
-		year: 2025,
-		description: "onchain slack tips",
-	},
-	{
 		name: "ethcall.org",
 		url: "https://ethcall.org",
 		year: 2025,
