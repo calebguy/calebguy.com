@@ -10,11 +10,10 @@ function readStoredNumber(key: string, fallback: number) {
 }
 
 export default function ColorBackground({ children }: { children: ReactNode }) {
-	const [hue, setHue] = useState(() => readStoredNumber("bgHue", 30));
+	const [hue, setHue] = useState(() => readStoredNumber("bgHue", 288));
 	const [saturation, setSaturation] = useState(() =>
-		readStoredNumber("bgSaturation", 90),
+		readStoredNumber("bgSaturation", 0),
 	);
-	// console.log({ hue, saturation });
 	const [dragPosition, setDragPosition] = useState<DragPosition | null>(null);
 
 	const touchStart = useRef<{
@@ -58,17 +57,18 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		localStorage.setItem("bgSaturation", String(saturation));
 
 		const bgColor = `hsl(${hue}, ${saturation}%, 50%)`;
+		const textColor = `hsl(${(hue + 180) % 360}, 100%, 75%)`;
+		const textColorHover = `hsl(${(hue + 180) % 360}, 100%, 45%)`;
 		document.documentElement.style.backgroundColor = bgColor;
 		document.body.style.backgroundColor = bgColor;
 
-		document.documentElement.style.setProperty(
-			"--text-color",
-			`hsl(${(hue + 180) % 360}, 100%, 75%)`,
-		);
-		document.documentElement.style.setProperty(
-			"--text-color-hover",
-			`hsl(${(hue + 180) % 360}, 100%, 45%)`,
-		);
+		console.log("custom colors", {
+			background: bgColor,
+			text: textColor,
+		});
+
+		document.documentElement.style.setProperty("--text-color", textColor);
+		document.documentElement.style.setProperty("--text-color-hover", textColorHover);
 	}, [hue, saturation]);
 
 	const handleTouchStart = (e: React.TouchEvent) => {

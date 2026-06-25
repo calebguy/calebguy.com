@@ -8,8 +8,8 @@
 }
 
 :root {
-  --background: #adee5d;
-  --foreground: #423d2c;
+  --background: hsl(288, 0%, 50%);
+  --foreground: hsl(108, 100%, 75%);
 }
 
 @theme inline {
@@ -21,8 +21,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #423d2c;
-    --foreground: #adee5d;
+    --background: hsl(288, 0%, 50%);
+    --foreground: hsl(108, 100%, 75%);
   }
 }
 

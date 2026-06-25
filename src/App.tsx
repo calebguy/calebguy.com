@@ -201,7 +201,7 @@ function Things() {
 					fontFamily: "'Merchant Copy', monospace",
 				}}
 			>
-				calebguy?
+				calebguy
 			</Link>
 		</>
 	);
@@ -217,7 +217,7 @@ function Blank() {
 				fontFamily: "'Merchant Copy', monospace",
 			}}
 		>
-			calebguy?
+			calebguy
 		</Link>
 	);
 }
@@ -225,21 +225,9 @@ function Blank() {
 function About() {
 	return (
 		<div className="flex flex-col items-start justify-between min-h-screen">
-			<section id="content">
-				<Link
-					href="/"
-					className="block text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
-					style={{
-						color: "var(--text-color)",
-						fontFamily: "'Merchant Copy', monospace",
-					}}
-				>
-					calebguy is a human using computers at cloudflare
-				</Link>
-			</section>
 
 			<div
-				className="fixed bottom-4 right-4 flex flex-row gap-6 md:gap-10 text-3xl md:text-6xl leading-snug select-none"
+				className="fixed bottom-4 right-4 flex flex-col items-end gap-1 text-5xl leading-snug select-none lg:left-4 lg:flex-row lg:flex-nowrap lg:justify-end lg:gap-x-10 lg:text-6xl"
 				style={{
 					fontFamily: "'Merchant Copy', monospace",
 				}}
@@ -250,7 +238,15 @@ function About() {
 					rel="noopener noreferrer"
 					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
 				>
-					gh
+					code
+				</a>
+				<a
+					href="https://www.instagram.com/caleb__guy/"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
+				>
+					scroll
 				</a>
 				<a
 					href="https://x.com/caleb__guy"
@@ -258,7 +254,7 @@ function About() {
 					rel="noopener noreferrer"
 					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
 				>
-					x
+					talk
 				</a>
 				<Link
 					href="/things"
