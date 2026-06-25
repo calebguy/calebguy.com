@@ -227,7 +227,7 @@ function About() {
 		<div className="flex flex-col items-start justify-between min-h-screen">
 
 			<div
-				className="fixed bottom-4 right-4 flex flex-col items-end gap-1 text-5xl leading-snug select-none lg:left-4 lg:flex-row lg:flex-nowrap lg:justify-end lg:gap-x-10 lg:text-6xl"
+				className="fixed bottom-4 right-4 flex flex-col items-end gap-1 text-3xl md:text-6xl leading-snug select-none lg:left-4 lg:flex-row lg:flex-nowrap lg:justify-end lg:gap-x-10"
 				style={{
 					fontFamily: "'Merchant Copy', monospace",
 				}}
