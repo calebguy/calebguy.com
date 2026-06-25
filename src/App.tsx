@@ -42,7 +42,7 @@ const projects = [
 		name: "doge pixels",
 		url: "https://pixels.ownthedoge.com/",
 		year: 2021,
-		description: "pixels of Kobosu the Doge",
+		description: "pixels of Kabosu",
 	},
 	{
 		name: "nebula",
@@ -225,7 +225,6 @@ function Blank() {
 function About() {
 	return (
 		<div className="flex flex-col items-start justify-between min-h-screen">
-
 			<div
 				className="fixed bottom-4 right-4 flex flex-col items-end gap-1 text-3xl md:text-6xl leading-snug select-none lg:left-4 lg:flex-row lg:flex-nowrap lg:justify-end lg:gap-x-10"
 				style={{
@@ -236,7 +235,8 @@ function About() {
 					href="https://github.com/calebguy"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
+					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
+					data-label="code"
 				>
 					code
 				</a>
@@ -244,7 +244,8 @@ function About() {
 					href="https://www.instagram.com/caleb__guy/"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
+					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
+					data-label="scroll"
 				>
 					scroll
 				</a>
@@ -252,13 +253,15 @@ function About() {
 					href="https://x.com/caleb__guy"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
+					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
+					data-label="talk"
 				>
 					talk
 				</a>
 				<Link
 					href="/things"
-					className="md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
+					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
+					data-label="things"
 				>
 					things
 				</Link>
