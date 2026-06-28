@@ -1,13 +1,21 @@
 import {
 	type AnchorHTMLAttributes,
 	type MouseEvent,
+	type ReactNode,
 	useSyncExternalStore,
 } from "react";
 import ColorBackground from "./components/ColorBackground";
 
 const NAVIGATION_EVENT = "calebguy:navigate";
 
-const projects = [
+interface Project {
+	name: string;
+	url: string;
+	year: number;
+	description: string;
+}
+
+const projects: Project[] = [
 	{
 		name: "ascii goggles",
 		url: "https://asciigoggles.calebguy.com",
@@ -19,30 +27,6 @@ const projects = [
 		url: "https://writer.place/",
 		year: 2025,
 		description: "write today, forever",
-	},
-	{
-		name: "ethcall.org",
-		url: "https://ethcall.org",
-		year: 2025,
-		description: "http eth_call",
-	},
-	{
-		name: "e+",
-		url: "/e+",
-		year: 2022,
-		description: "internet image curation",
-	},
-	{
-		name: "wanwan",
-		url: "https://wanwan-roan.vercel.app/",
-		year: 2022,
-		description: "meme competitions for communities",
-	},
-	{
-		name: "doge pixels",
-		url: "https://pixels.ownthedoge.com/",
-		year: 2021,
-		description: "pixels of Kabosu",
 	},
 	{
 		name: "nebula",
@@ -79,6 +63,39 @@ const projects = [
 		url: "https://wordplay-beta.vercel.app/",
 		year: 2018,
 		description: "word conglomorator",
+	},
+];
+
+const jobProjects: Project[] = [
+	{
+		name: "slack.tips",
+		url: "https://slack.tips",
+		year: 2025,
+		description: "onchain slack tips",
+	},
+	{
+		name: "ethcall.org",
+		url: "https://ethcall.org",
+		year: 2025,
+		description: "http eth_call",
+	},
+	{
+		name: "e+",
+		url: "/e+",
+		year: 2022,
+		description: "internet image curation",
+	},
+	{
+		name: "wanwan",
+		url: "https://wanwan-roan.vercel.app/",
+		year: 2022,
+		description: "meme competitions for communities",
+	},
+	{
+		name: "doge pixels",
+		url: "https://pixels.ownthedoge.com/",
+		year: 2021,
+		description: "pixels of Kabosu",
 	},
 ];
 
@@ -154,45 +171,161 @@ function Link({ href, onClick, target, children, ...props }: LinkProps) {
 	);
 }
 
-function Things() {
+function WorkSummary() {
+	return (
+		<div className="flex flex-col text-xl md:text-3xl leading-snug select-none">
+			<span>
+				<span className="text-white opacity-65">current: </span>
+				<a
+					href="https://www.cloudflare.com/"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
+					style={{ color: "var(--text-color)" }}
+				>
+					cloudflare
+				</a>
+			</span>
+			<span>
+				<span className="text-white opacity-65">previous: </span>
+				<a
+					href="https://syndicate.io/"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
+					style={{ color: "var(--text-color)" }}
+				>
+					syndicate
+				</a>
+				<span className="text-white opacity-65">, </span>
+				<a
+					href="https://www.ownthedoge.com/"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
+					style={{ color: "var(--text-color)" }}
+				>
+					ownthedoge
+				</a>
+				<span className="text-white opacity-65">, </span>
+				<a
+					href="https://rocketreach.co/iterative-capital-management-profile_b45c78d0fc6e8eaa"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
+					style={{ color: "var(--text-color)" }}
+				>
+					a crypto otc desk
+				</a>
+			</span>
+			<span className="mt-2 text-white opacity-65">---</span>
+		</div>
+	);
+}
+
+function ProjectLinks({
+	projects,
+	summary,
+}: {
+	projects: Project[];
+	summary?: ReactNode;
+}) {
+	return (
+		<section
+			id="content"
+			className="flex flex-col items-start gap-2 md:gap-0 overflow-y-auto max-h-dvh"
+		>
+			{summary}
+			{projects.map((project) => {
+				const isExternal = project.url.startsWith("http");
+				return (
+					<Link
+						key={project.name}
+						{...(isExternal && {
+							target: "_blank",
+							rel: "noopener noreferrer",
+						})}
+						href={project.url}
+						className="text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--text-color-hover)! select-none group flex flex-col md:flex-row md:gap-2"
+						style={{
+							color: "var(--text-color)",
+							fontFamily: "'Merchant Copy', monospace",
+						}}
+					>
+						{project.name}
+						<span className="text-xl md:text-3xl md:hidden opacity-65 text-white">
+							<span className="italic">({project.year})</span>{" "}
+							{project.description}
+						</span>
+						<span className="text-3xl hidden md:group-hover:block self-center italic opacity-65 text-white">
+							({project.year})
+						</span>
+						<span className="text-3xl hidden md:group-hover:block self-center opacity-65 text-white">
+							{project.description}
+						</span>
+					</Link>
+				);
+			})}
+		</section>
+	);
+}
+
+function ThingsPage({
+	projects,
+	summary,
+}: {
+	projects: Project[];
+	summary?: ReactNode;
+}) {
 	return (
 		<>
-			<section
-				id="content"
-				className="flex flex-col items-start gap-2 md:gap-0 overflow-y-auto max-h-dvh"
-			>
-				{projects.map((project) => {
-					const isExternal = project.url.startsWith("http");
-					return (
-						<Link
-							key={project.name}
-							{...(isExternal && {
-								target: "_blank",
-								rel: "noopener noreferrer",
-							})}
-							href={project.url}
-							className="text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--text-color-hover)! select-none group flex flex-col md:flex-row md:gap-2"
-							style={{
-								color: "var(--text-color)",
-								fontFamily: "'Merchant Copy', monospace",
-							}}
-						>
-							{project.name}
-							<span className="text-xl md:text-3xl md:hidden opacity-65 text-white">
-								<span className="italic">({project.year})</span>{" "}
-								{project.description}
-							</span>
-							<span className="text-3xl hidden md:group-hover:block self-center italic opacity-65 text-white">
-								({project.year})
-							</span>
-							<span className="text-3xl hidden md:group-hover:block self-center opacity-65 text-white">
-								{project.description}
-							</span>
-						</Link>
-					);
-				})}
-			</section>
+			<ProjectLinks projects={projects} summary={summary} />
 
+			<Link
+				href="/"
+				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+				style={{
+					color: "var(--text-color)",
+					fontFamily: "'Merchant Copy', monospace",
+				}}
+			>
+				/
+			</Link>
+		</>
+	);
+}
+
+function Things() {
+	return <ThingsPage projects={projects} />;
+}
+
+function ThingsIMadeForAJob() {
+	return <ThingsPage projects={jobProjects} summary={<WorkSummary />} />;
+}
+
+function Blank() {
+	return (
+		<>
+			<div
+				id="content"
+				className="flex flex-col items-start gap-2 text-3xl md:text-6xl leading-snug select-none"
+				style={{
+					fontFamily: "'Merchant Copy', monospace",
+				}}
+			>
+				<Link
+					href="/things-i-made-for-me-and-care-about"
+					className="transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100 md:hover:font-bold"
+				>
+					me
+				</Link>
+				<Link
+					href="/things-i-made-for-a-job"
+					className="transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100 md:hover:font-bold"
+				>
+					work
+				</Link>
+			</div>
 			<Link
 				href="/about"
 				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
@@ -207,26 +340,12 @@ function Things() {
 	);
 }
 
-function Blank() {
-	return (
-		<Link
-			href="/about"
-			className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
-			style={{
-				color: "var(--text-color)",
-				fontFamily: "'Merchant Copy', monospace",
-			}}
-		>
-			calebguy
-		</Link>
-	);
-}
-
 function About() {
 	return (
 		<div className="flex flex-col items-start justify-between min-h-screen">
 			<div
-				className="fixed bottom-4 right-4 flex flex-col items-end gap-1 text-3xl md:text-6xl leading-snug select-none lg:left-4 lg:flex-row lg:flex-nowrap lg:justify-end lg:gap-x-10"
+				id="content"
+				className="flex flex-col items-start gap-2 text-3xl md:text-6xl leading-snug select-none"
 				style={{
 					fontFamily: "'Merchant Copy', monospace",
 				}}
@@ -245,27 +364,30 @@ function About() {
 					target="_blank"
 					rel="noopener noreferrer"
 					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
-					data-label="scroll"
+					data-label="look"
 				>
-					scroll
+					look
 				</a>
 				<a
 					href="https://x.com/caleb__guy"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
-					data-label="talk"
+					data-label="read"
 				>
-					talk
+					read
 				</a>
-				<Link
-					href="/things"
-					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
-					data-label="things"
-				>
-					things
-				</Link>
 			</div>
+			<Link
+				href="/"
+				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+				style={{
+					color: "var(--text-color)",
+					fontFamily: "'Merchant Copy', monospace",
+				}}
+			>
+				/
+			</Link>
 		</div>
 	);
 }
@@ -312,10 +434,10 @@ function EPlus() {
 			</section>
 
 			<Link
-				href="/things"
+				href="/things-i-made-for-a-job"
 				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
 			>
-				things
+				work
 			</Link>
 		</div>
 	);
@@ -327,8 +449,10 @@ function Route({ pathname }: { pathname: string }) {
 			return <Blank />;
 		case "/about":
 			return <About />;
-		case "/things":
+		case "/things-i-made-for-me-and-care-about":
 			return <Things />;
+		case "/things-i-made-for-a-job":
+			return <ThingsIMadeForAJob />;
 		case "/e+":
 			return <EPlus />;
 		default:
