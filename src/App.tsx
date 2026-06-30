@@ -173,7 +173,7 @@ function Link({ href, onClick, target, children, ...props }: LinkProps) {
 
 function WorkSummary() {
 	return (
-		<div className="flex flex-col text-xl md:text-3xl leading-snug select-none">
+		<div className="mb-12 flex w-full flex-col text-3xl md:mb-12 md:text-6xl leading-snug select-none">
 			<span>
 				<span className="text-white opacity-65">current: </span>
 				<a
@@ -215,10 +215,17 @@ function WorkSummary() {
 					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
 					style={{ color: "var(--text-color)" }}
 				>
-					a crypto otc desk
+					an otc desk
 				</a>
 			</span>
-			<span className="mt-2 text-white opacity-65">---</span>
+			<span
+				aria-hidden="true"
+				className="mt-10 md:mt-12 block h-1 w-full"
+				style={{
+					backgroundImage:
+						"repeating-linear-gradient(to right, rgba(255, 255, 255, 0.65) 0 3rem, transparent 3rem 5rem)",
+				}}
+			/>
 		</div>
 	);
 }
@@ -310,20 +317,27 @@ function Blank() {
 				id="content"
 				className="flex flex-col items-start gap-2 text-3xl md:text-6xl leading-snug select-none"
 				style={{
+					color: "var(--text-color)",
 					fontFamily: "'Merchant Copy', monospace",
 				}}
 			>
 				<Link
 					href="/things-i-made-for-me-and-care-about"
-					className="transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100 md:hover:font-bold"
+					className="group flex flex-col md:flex-row md:gap-2 transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
 				>
-					me
+					things
+					<span className="text-3xl hidden md:group-hover:block self-center opacity-65 text-white">
+						projects for me
+					</span>
 				</Link>
 				<Link
 					href="/things-i-made-for-a-job"
-					className="transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100 md:hover:font-bold"
+					className="group flex flex-col md:flex-row md:gap-2 transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
 				>
 					work
+					<span className="text-3xl hidden md:group-hover:block self-center opacity-65 text-white">
+						projects for someone else
+					</span>
 				</Link>
 			</div>
 			<Link
@@ -347,6 +361,7 @@ function About() {
 				id="content"
 				className="flex flex-col items-start gap-2 text-3xl md:text-6xl leading-snug select-none"
 				style={{
+					color: "var(--text-color)",
 					fontFamily: "'Merchant Copy', monospace",
 				}}
 			>
@@ -354,28 +369,25 @@ function About() {
 					href="https://github.com/calebguy"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
-					data-label="code"
+					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
 				>
-					code
+					gh
 				</a>
 				<a
 					href="https://www.instagram.com/caleb__guy/"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
-					data-label="look"
+					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
 				>
-					look
+					insta
 				</a>
 				<a
 					href="https://x.com/caleb__guy"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="about-link md:hover:font-bold transition-colors hover:text-(--text-color-hover)! text-white opacity-65 hover:opacity-100"
-					data-label="read"
+					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
 				>
-					read
+					x
 				</a>
 			</div>
 			<Link
