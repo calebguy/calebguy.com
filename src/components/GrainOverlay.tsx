@@ -82,9 +82,19 @@ function createShader(
 
 interface GrainOverlayProps {
 	dragPosition: DragPosition | null;
+	className?: string;
+	resizeMode?: "viewport" | "element";
+	grainScale?: number;
+	grainIntensity?: number;
 }
 
-export default function GrainOverlay({ dragPosition }: GrainOverlayProps) {
+export default function GrainOverlay({
+	dragPosition,
+	className = "fixed inset-0 pointer-events-none mix-blend-overlay",
+	resizeMode = "viewport",
+	grainScale: grainScaleProp,
+	grainIntensity: grainIntensityProp,
+}: GrainOverlayProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const dragDataRef = useRef({
 		pos: [0, 0] as [number, number],
@@ -143,8 +153,8 @@ export default function GrainOverlay({ dragPosition }: GrainOverlayProps) {
 		const dragPosLocation = gl.getUniformLocation(program, "u_dragPos");
 		const isDraggingLocation = gl.getUniformLocation(program, "u_isDragging");
 
-		const grainScale = 1 + Math.random() * 10;
-		const grainIntensity = 0.15 + Math.random() * 0.15;
+		const grainScale = grainScaleProp ?? 1 + Math.random() * 10;
+		const grainIntensity = grainIntensityProp ?? 0.15 + Math.random() * 0.15;
 		const seed = Math.random() * 100;
 
 		const positionBuffer = gl.createBuffer();
@@ -160,14 +170,27 @@ export default function GrainOverlay({ dragPosition }: GrainOverlayProps) {
 
 		const resize = () => {
 			const dpr = Math.min(window.devicePixelRatio || 1, 2);
-			canvas.width = window.innerWidth * dpr;
-			canvas.height = window.innerHeight * dpr;
-			canvas.style.width = `${window.innerWidth}px`;
-			canvas.style.height = `${window.innerHeight}px`;
+			const width =
+				resizeMode === "viewport" ? window.innerWidth : canvas.clientWidth;
+			const height =
+				resizeMode === "viewport" ? window.innerHeight : canvas.clientHeight;
+
+			canvas.width = Math.max(1, Math.floor(width * dpr));
+			canvas.height = Math.max(1, Math.floor(height * dpr));
+
+			if (resizeMode === "viewport") {
+				canvas.style.width = `${window.innerWidth}px`;
+				canvas.style.height = `${window.innerHeight}px`;
+			}
+
 			gl.viewport(0, 0, canvas.width, canvas.height);
 		};
 		resize();
 		window.addEventListener("resize", resize);
+
+		const resizeObserver =
+			resizeMode === "element" ? new ResizeObserver(resize) : null;
+		resizeObserver?.observe(canvas);
 
 		let animationId: number;
 		const startTime = Date.now();
@@ -198,18 +221,14 @@ export default function GrainOverlay({ dragPosition }: GrainOverlayProps) {
 
 		return () => {
 			window.removeEventListener("resize", resize);
+			resizeObserver?.disconnect();
 			cancelAnimationFrame(animationId);
 			gl.deleteBuffer(positionBuffer);
 			gl.deleteProgram(program);
 			gl.deleteShader(vs);
 			gl.deleteShader(fs);
 		};
-	}, []);
+	}, [grainIntensityProp, grainScaleProp, resizeMode]);
 
-	return (
-		<canvas
-			ref={canvasRef}
-			className="fixed inset-0 pointer-events-none mix-blend-overlay"
-		/>
-	);
+	return <canvas ref={canvasRef} className={className} />;
 }

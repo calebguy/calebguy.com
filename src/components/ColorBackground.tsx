@@ -59,16 +59,19 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		const bgColor = `hsl(${hue}, ${saturation}%, 50%)`;
 		const textColor = `hsl(${(hue + 180) % 360}, 100%, 75%)`;
 		const textColorHover = `hsl(${(hue + 180) % 360}, 100%, 45%)`;
+		const separatorColor = `hsl(${(hue + 8) % 360}, ${Math.min(
+			100,
+			saturation + 10,
+		)}%, 52%)`;
 		document.documentElement.style.backgroundColor = bgColor;
 		document.body.style.backgroundColor = bgColor;
 
-		console.log("custom colors", {
-			background: bgColor,
-			text: textColor,
-		});
-
 		document.documentElement.style.setProperty("--text-color", textColor);
 		document.documentElement.style.setProperty("--text-color-hover", textColorHover);
+		document.documentElement.style.setProperty(
+			"--separator-color",
+			separatorColor,
+		);
 	}, [hue, saturation]);
 
 	const handleTouchStart = (e: React.TouchEvent) => {

@@ -10,6 +10,7 @@
 :root {
   --background: hsl(288, 0%, 50%);
   --foreground: hsl(108, 100%, 75%);
+  --separator-color: hsl(306, 20%, 56%);
 }
 
 @theme inline {
@@ -52,4 +53,14 @@ body {
   padding-bottom: calc(4rem + env(safe-area-inset-bottom));
   padding-left: calc(1rem + env(safe-area-inset-left));
   padding-right: calc(1rem + env(safe-area-inset-right));
+}
+
+.work-separator {
+  position: relative;
+  display: block;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  height: 50px;
+  overflow: hidden;
+  background: var(--separator-color);
 }

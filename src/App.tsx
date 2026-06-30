@@ -5,6 +5,7 @@ import {
 	useSyncExternalStore,
 } from "react";
 import ColorBackground from "./components/ColorBackground";
+import GrainOverlay from "./components/GrainOverlay";
 
 const NAVIGATION_EVENT = "calebguy:navigate";
 
@@ -173,7 +174,7 @@ function Link({ href, onClick, target, children, ...props }: LinkProps) {
 
 function WorkSummary() {
 	return (
-		<div className="mb-12 flex w-full flex-col text-3xl md:mb-12 md:text-6xl leading-snug select-none">
+		<div className="flex w-full flex-col text-3xl md:text-6xl leading-snug select-none">
 			<span>
 				<span className="text-white opacity-65">current: </span>
 				<a
@@ -218,14 +219,15 @@ function WorkSummary() {
 					an otc desk
 				</a>
 			</span>
-			<span
-				aria-hidden="true"
-				className="mt-10 md:mt-12 block h-1 w-full"
-				style={{
-					backgroundImage:
-						"repeating-linear-gradient(to right, rgba(255, 255, 255, 0.65) 0 3rem, transparent 3rem 5rem)",
-				}}
-			/>
+			<span aria-hidden="true" className="work-separator mt-4 mb-4">
+				<GrainOverlay
+					dragPosition={null}
+					resizeMode="element"
+					grainScale={14}
+					grainIntensity={0.38}
+					className="absolute inset-0 h-full w-full pointer-events-none mix-blend-overlay"
+				/>
+			</span>
 		</div>
 	);
 }
