@@ -2,6 +2,7 @@ import {
 	type AnchorHTMLAttributes,
 	type MouseEvent,
 	type ReactNode,
+	useState,
 	useSyncExternalStore,
 } from "react";
 import ColorBackground from "./components/ColorBackground";
@@ -14,6 +15,8 @@ interface Project {
 	url: string;
 	year: number;
 	description: string;
+	imageSrc?: string;
+	imageAlt?: string;
 }
 
 const projects: Project[] = [
@@ -22,48 +25,56 @@ const projects: Project[] = [
 		url: "https://asciigoggles.calebguy.com",
 		year: 2026,
 		description: "life in ascii",
+		imageSrc: "/projects/ascii-goggles.png",
+		imageAlt: "ascii goggles screenshot",
 	},
 	{
 		name: "writer",
 		url: "https://writer.place/",
 		year: 2025,
 		description: "write today, forever",
+		imageSrc: "/projects/writer.png",
+		imageAlt: "writer screenshot",
 	},
 	{
 		name: "nebula",
 		url: "https://nebula-kappa-rust.vercel.app/",
 		year: 2019,
-		description: "playable music video",
+		description: "music video/video game",
+		imageSrc: "/projects/nebula.jpg",
+		imageAlt: "nebula screenshot",
 	},
 	{
 		name: "bloonnoise",
 		url: "https://youtu.be/yKZbCIlSwHc",
 		year: 2019,
-		description: "touchable balloons",
+		description: "playable balloons",
+		imageSrc: "/projects/bloon_noise.jpg",
+		imageAlt: "bloonnoise screenshot",
 	},
 	{
 		name: "user",
 		url: "https://youtu.be/NBI_6D5yV3c",
 		year: 2019,
 		description: "interactive phone fear factory",
+		imageSrc: "/projects/user.jpg",
+		imageAlt: "user screenshot",
 	},
 	{
 		name: "decisions",
 		url: "https://decisions-navy.vercel.app/",
 		year: 2019,
 		description: "decision visualization",
+		imageSrc: "/projects/decision.jpg",
+		imageAlt: "decisions screenshot",
 	},
 	{
 		name: "painthead",
 		url: "https://painthead.vercel.app/",
 		year: 2018,
 		description: "online yelling installation",
-	},
-	{
-		name: "wordplay",
-		url: "https://wordplay-beta.vercel.app/",
-		year: 2018,
-		description: "word conglomorator",
+		imageSrc: "/projects/painthead.jpg",
+		imageAlt: "painthead screenshot",
 	},
 ];
 
@@ -232,6 +243,81 @@ function WorkSummary() {
 	);
 }
 
+interface ProjectLinkProps {
+	project: Project;
+	isPreviewActive?: boolean;
+	onPreviewDismiss?: () => void;
+	onPreviewRequest?: () => void;
+}
+
+function ProjectLink({
+	project,
+	isPreviewActive = false,
+	onPreviewDismiss,
+	onPreviewRequest,
+}: ProjectLinkProps) {
+	const linkTargetProps = project.url.startsWith("http")
+		? { target: "_blank", rel: "noopener noreferrer" }
+		: {};
+	const activeClassName = isPreviewActive ? " md:font-bold" : "";
+
+	return (
+		<Link
+			key={project.name}
+			{...linkTargetProps}
+			href={project.url}
+			aria-label={`${project.name}: ${project.description}`}
+			onFocus={onPreviewRequest}
+			onBlur={onPreviewDismiss}
+			onMouseEnter={onPreviewRequest}
+			onMouseLeave={onPreviewDismiss}
+			className={`text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--text-color-hover)! select-none group flex flex-col md:flex-row md:gap-2${activeClassName}`}
+			style={{
+				color: "var(--text-color)",
+				fontFamily: "'Merchant Copy', monospace",
+			}}
+		>
+			{project.name}
+			<span className="text-xl md:text-3xl md:hidden opacity-65 text-white">
+				<span className="italic">({project.year})</span> {project.description}
+			</span>
+		</Link>
+	);
+}
+
+function ProjectPreview({ project }: { project: Project }) {
+	if (!project.imageSrc) {
+		return null;
+	}
+
+	return (
+		<aside
+			aria-hidden="true"
+			className="pointer-events-none sticky top-4 hidden h-[calc(100dvh-8rem)] w-full max-w-[56rem] flex-col justify-center md:flex select-none"
+		>
+			<figure className="flex flex-col items-center">
+				<img
+					src={project.imageSrc}
+					alt=""
+					className="block max-h-[70dvh] rounded-3xl object-contain"
+				/>
+				<figcaption
+					className="mt-3 flex flex-col items-center text-center lowercase"
+					style={{
+						color: "var(--text-color)",
+						fontFamily: "'Merchant Copy', monospace",
+					}}
+				>
+					<span className="text-2xl opacity-65 text-white">
+						<span className="italic">{project.year}::</span>
+						{project.description}
+					</span>
+				</figcaption>
+			</figure>
+		</aside>
+	);
+}
+
 function ProjectLinks({
 	projects,
 	summary,
@@ -239,42 +325,48 @@ function ProjectLinks({
 	projects: Project[];
 	summary?: ReactNode;
 }) {
+	const previewProjects = projects.filter((project) => project.imageSrc);
+	const [activeProjectName, setActiveProjectName] = useState<string | null>(
+		null,
+	);
+	const activePreviewProject =
+		previewProjects.find((project) => project.name === activeProjectName) ??
+		null;
+	const hasProjectPreviews = previewProjects.length > 0;
+	const sectionClassName = hasProjectPreviews
+		? "grid max-h-dvh grid-cols-1 gap-6 overflow-y-auto md:grid-cols-[minmax(24rem,44rem)_minmax(24rem,1fr)] md:items-start md:gap-12"
+		: "flex max-h-dvh flex-col items-center gap-6 overflow-y-auto";
+
 	return (
-		<section
-			id="content"
-			className="flex flex-col items-start gap-2 md:gap-0 overflow-y-auto max-h-dvh"
-		>
+		<section id="content" className={sectionClassName}>
 			{summary}
-			{projects.map((project) => {
-				const isExternal = project.url.startsWith("http");
-				return (
-					<Link
+			<div className="flex w-full flex-col items-start">
+				{projects.map((project) => (
+					<ProjectLink
 						key={project.name}
-						{...(isExternal && {
-							target: "_blank",
-							rel: "noopener noreferrer",
-						})}
-						href={project.url}
-						className="text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--text-color-hover)! select-none group flex flex-col md:flex-row md:gap-2"
-						style={{
-							color: "var(--text-color)",
-							fontFamily: "'Merchant Copy', monospace",
-						}}
-					>
-						{project.name}
-						<span className="text-xl md:text-3xl md:hidden opacity-65 text-white">
-							<span className="italic">({project.year})</span>{" "}
-							{project.description}
-						</span>
-						<span className="text-3xl hidden md:group-hover:block self-center italic opacity-65 text-white">
-							({project.year})
-						</span>
-						<span className="text-3xl hidden md:group-hover:block self-center opacity-65 text-white">
-							{project.description}
-						</span>
-					</Link>
-				);
-			})}
+						project={project}
+						isPreviewActive={project.name === activePreviewProject?.name}
+						onPreviewDismiss={
+							project.imageSrc
+								? () =>
+										setActiveProjectName((currentProjectName) =>
+											currentProjectName === project.name
+												? null
+												: currentProjectName,
+										)
+								: undefined
+						}
+						onPreviewRequest={
+							project.imageSrc
+								? () => setActiveProjectName(project.name)
+								: () => setActiveProjectName(null)
+						}
+					/>
+				))}
+			</div>
+			{activePreviewProject ? (
+				<ProjectPreview project={activePreviewProject} />
+			) : null}
 		</section>
 	);
 }
@@ -315,33 +407,7 @@ function ThingsIMadeForAJob() {
 function Blank() {
 	return (
 		<>
-			<div
-				id="content"
-				className="flex flex-col items-start gap-2 text-3xl md:text-6xl leading-snug select-none"
-				style={{
-					color: "var(--text-color)",
-					fontFamily: "'Merchant Copy', monospace",
-				}}
-			>
-				<Link
-					href="/things-i-made-for-me-and-care-about"
-					className="group flex flex-col md:flex-row md:gap-2 transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
-				>
-					things
-					<span className="text-3xl hidden md:group-hover:block self-center opacity-65 text-white">
-						projects for me
-					</span>
-				</Link>
-				<Link
-					href="/things-i-made-for-a-job"
-					className="group flex flex-col md:flex-row md:gap-2 transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
-				>
-					work
-					<span className="text-3xl hidden md:group-hover:block self-center opacity-65 text-white">
-						projects for someone else
-					</span>
-				</Link>
-			</div>
+			<ProjectLinks projects={projects} />
 			<Link
 				href="/about"
 				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
