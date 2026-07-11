@@ -47,7 +47,8 @@ const projects: Project[] = [
 		url: "https://nebula-kappa-rust.vercel.app/",
 		year: 2019,
 		description: "music video/video game",
-		previewSrc: "/projects/nebula.jpg",
+		previewSrc: "/projects/nebula-preview.mp4",
+		previewPosterSrc: "/projects/nebula-poster.jpg",
 	},
 	{
 		name: "bloonnoise",
