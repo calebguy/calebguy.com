@@ -9,14 +9,20 @@ import ColorBackground from "./components/ColorBackground";
 import GrainOverlay from "./components/GrainOverlay";
 
 const NAVIGATION_EVENT = "calebguy:navigate";
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+const VIDEO_PREVIEW_PATTERN = /\.(mp4|webm|ogg|mov)(?:[?#].*)?$/i;
+const MOTION_IMAGE_PREVIEW_PATTERN = /\.(gif|apng)(?:[?#].*)?$/i;
+const PROJECT_PREVIEW_FRAME_CLASS_NAME =
+	"aspect-[4/5] w-full max-w-[calc(70dvh*0.8)] overflow-hidden rounded-3xl";
+const PROJECT_PREVIEW_MEDIA_CLASS_NAME = "h-full w-full object-cover";
 
 interface Project {
 	name: string;
 	url: string;
 	year: number;
 	description: string;
-	imageSrc?: string;
-	imageAlt?: string;
+	previewSrc?: string;
+	previewPosterSrc?: string;
 }
 
 const projects: Project[] = [
@@ -25,56 +31,51 @@ const projects: Project[] = [
 		url: "https://asciigoggles.calebguy.com",
 		year: 2026,
 		description: "life in ascii",
-		imageSrc: "/projects/ascii-goggles.png",
-		imageAlt: "ascii goggles screenshot",
+		previewSrc: "/projects/ascii-goggles-preview.mp4",
+		previewPosterSrc: "/projects/ascii-goggles-poster.jpg",
 	},
 	{
 		name: "writer",
 		url: "https://writer.place/",
 		year: 2025,
 		description: "write today, forever",
-		imageSrc: "/projects/writer.png",
-		imageAlt: "writer screenshot",
+		previewSrc: "/projects/writer-preview.mp4",
+		previewPosterSrc: "/projects/writer-poster.jpg",
 	},
 	{
 		name: "nebula",
 		url: "https://nebula-kappa-rust.vercel.app/",
 		year: 2019,
 		description: "music video/video game",
-		imageSrc: "/projects/nebula.jpg",
-		imageAlt: "nebula screenshot",
+		previewSrc: "/projects/nebula.jpg",
 	},
 	{
 		name: "bloonnoise",
 		url: "https://youtu.be/yKZbCIlSwHc",
 		year: 2019,
 		description: "playable balloons",
-		imageSrc: "/projects/bloon_noise.jpg",
-		imageAlt: "bloonnoise screenshot",
+		previewSrc: "/projects/bloon_noise.jpg",
 	},
 	{
 		name: "user",
 		url: "https://youtu.be/NBI_6D5yV3c",
 		year: 2019,
 		description: "interactive phone fear factory",
-		imageSrc: "/projects/user.jpg",
-		imageAlt: "user screenshot",
+		previewSrc: "/projects/user.jpg",
 	},
 	{
 		name: "decisions",
 		url: "https://decisions-navy.vercel.app/",
 		year: 2019,
 		description: "decision visualization",
-		imageSrc: "/projects/decision.jpg",
-		imageAlt: "decisions screenshot",
+		previewSrc: "/projects/decision.jpg",
 	},
 	{
 		name: "painthead",
 		url: "https://painthead.vercel.app/",
 		year: 2018,
 		description: "online yelling installation",
-		imageSrc: "/projects/painthead.jpg",
-		imageAlt: "painthead screenshot",
+		previewSrc: "/projects/painthead.jpg",
 	},
 ];
 
@@ -140,6 +141,24 @@ function subscribeToNavigation(callback: () => void) {
 
 function usePathname() {
 	return useSyncExternalStore(subscribeToNavigation, getPathname, () => "/");
+}
+
+
+function subscribeToReducedMotion(callback: () => void) {
+	const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);
+	mediaQuery.addEventListener("change", callback);
+
+	return () => {
+		mediaQuery.removeEventListener("change", callback);
+	};
+}
+
+function usePrefersReducedMotion() {
+	return useSyncExternalStore(
+		subscribeToReducedMotion,
+		() => window.matchMedia(REDUCED_MOTION_QUERY).matches,
+		() => false,
+	);
 }
 
 function navigate(href: string) {
@@ -286,21 +305,61 @@ function ProjectLink({
 }
 
 function ProjectPreview({ project }: { project: Project }) {
-	if (!project.imageSrc) {
+	const prefersReducedMotion = usePrefersReducedMotion();
+	const previewSrc = project.previewSrc;
+
+	if (!previewSrc) {
 		return null;
 	}
+
+	const isVideoPreview = VIDEO_PREVIEW_PATTERN.test(previewSrc);
+	const hasMotionImagePreview = MOTION_IMAGE_PREVIEW_PATTERN.test(previewSrc);
+	const shouldUsePosterImage =
+		prefersReducedMotion &&
+		Boolean(project.previewPosterSrc) &&
+		(isVideoPreview || hasMotionImagePreview);
+	const shouldPlayVideo = isVideoPreview && !prefersReducedMotion;
+	const imagePreviewSrc =
+		shouldUsePosterImage && project.previewPosterSrc
+			? project.previewPosterSrc
+			: previewSrc;
 
 	return (
 		<aside
 			aria-hidden="true"
-			className="pointer-events-none sticky top-4 hidden h-[calc(100dvh-8rem)] w-full max-w-[56rem] flex-col justify-center md:flex select-none"
+			className="pointer-events-none sticky top-4 mx-auto hidden h-[calc(100dvh-8rem)] w-full max-w-[56rem] flex-col justify-center justify-self-center md:flex select-none"
 		>
-			<figure className="flex flex-col items-center">
-				<img
-					src={project.imageSrc}
-					alt=""
-					className="block max-h-[70dvh] rounded-3xl object-contain"
-				/>
+			<figure className="flex w-full flex-col items-center">
+				<div className={PROJECT_PREVIEW_FRAME_CLASS_NAME}>
+					{shouldPlayVideo ? (
+						<video
+							key={previewSrc}
+							src={previewSrc}
+							poster={project.previewPosterSrc}
+							autoPlay
+							muted
+							loop
+							playsInline
+							preload="auto"
+							className={PROJECT_PREVIEW_MEDIA_CLASS_NAME}
+						/>
+					) : isVideoPreview && !project.previewPosterSrc ? (
+						<video
+							key={previewSrc}
+							src={previewSrc}
+							muted
+							playsInline
+							preload="metadata"
+							className={PROJECT_PREVIEW_MEDIA_CLASS_NAME}
+						/>
+					) : (
+						<img
+							src={imagePreviewSrc}
+							alt=""
+							className={PROJECT_PREVIEW_MEDIA_CLASS_NAME}
+						/>
+					)}
+				</div>
 				<figcaption
 					className="mt-3 flex flex-col items-center text-center lowercase"
 					style={{
@@ -325,7 +384,7 @@ function ProjectLinks({
 	projects: Project[];
 	summary?: ReactNode;
 }) {
-	const previewProjects = projects.filter((project) => project.imageSrc);
+	const previewProjects = projects.filter((project) => project.previewSrc);
 	const [activeProjectName, setActiveProjectName] = useState<string | null>(
 		null,
 	);
@@ -347,7 +406,7 @@ function ProjectLinks({
 						project={project}
 						isPreviewActive={project.name === activePreviewProject?.name}
 						onPreviewDismiss={
-							project.imageSrc
+							project.previewSrc
 								? () =>
 										setActiveProjectName((currentProjectName) =>
 											currentProjectName === project.name
@@ -357,7 +416,7 @@ function ProjectLinks({
 								: undefined
 						}
 						onPreviewRequest={
-							project.imageSrc
+							project.previewSrc
 								? () => setActiveProjectName(project.name)
 								: () => setActiveProjectName(null)
 						}
