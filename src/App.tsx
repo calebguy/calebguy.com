@@ -12,8 +12,9 @@ const NAVIGATION_EVENT = "calebguy:navigate";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const VIDEO_PREVIEW_PATTERN = /\.(mp4|webm|ogg|mov)(?:[?#].*)?$/i;
 const MOTION_IMAGE_PREVIEW_PATTERN = /\.(gif|apng)(?:[?#].*)?$/i;
-const PROJECT_PREVIEW_FRAME_CLASS_NAME =
-	"aspect-[4/5] w-full max-w-[calc(70dvh*0.8)] overflow-hidden rounded-3xl";
+const PROJECT_PREVIEW_FRAME_CLASS_NAME = "w-full overflow-hidden rounded-3xl";
+const DEFAULT_PROJECT_PREVIEW_ASPECT_RATIO = 4 / 5;
+const MAX_PROJECT_PREVIEW_HEIGHT_DVH = 70;
 const PROJECT_PREVIEW_MEDIA_CLASS_NAME = "h-full w-full object-cover";
 
 interface Project {
@@ -23,6 +24,7 @@ interface Project {
 	description: string;
 	previewSrc?: string;
 	previewPosterSrc?: string;
+	previewAspectRatio?: number;
 }
 
 const projects: Project[] = [
@@ -55,21 +57,26 @@ const projects: Project[] = [
 		url: "https://youtu.be/yKZbCIlSwHc",
 		year: 2019,
 		description: "playable balloons",
-		previewSrc: "/projects/bloon_noise.jpg",
+		previewSrc: "/projects/bloonnoise-preview.mp4",
+		previewPosterSrc: "/projects/bloonnoise-poster.jpg",
+		previewAspectRatio: 16 / 9,
 	},
 	{
 		name: "user",
 		url: "https://youtu.be/NBI_6D5yV3c",
 		year: 2019,
 		description: "interactive phone fear factory",
-		previewSrc: "/projects/user.jpg",
+		previewSrc: "/projects/user-preview.mp4",
+		previewPosterSrc: "/projects/user-poster.jpg",
+		previewAspectRatio: 16 / 9,
 	},
 	{
 		name: "decisions",
 		url: "https://decisions-navy.vercel.app/",
 		year: 2019,
-		description: "decision visualization",
-		previewSrc: "/projects/decision.jpg",
+		description: "interactive path sculpture",
+		previewSrc: "/projects/decisions-preview.mp4",
+		previewPosterSrc: "/projects/decisions-poster.jpg",
 	},
 	{
 		name: "painthead",
@@ -324,6 +331,9 @@ function ProjectPreview({ project }: { project: Project }) {
 		shouldUsePosterImage && project.previewPosterSrc
 			? project.previewPosterSrc
 			: previewSrc;
+	const previewAspectRatio =
+		project.previewAspectRatio ?? DEFAULT_PROJECT_PREVIEW_ASPECT_RATIO;
+	const maxPreviewWidth = `${MAX_PROJECT_PREVIEW_HEIGHT_DVH * previewAspectRatio}dvh`;
 
 	return (
 		<aside
@@ -331,7 +341,13 @@ function ProjectPreview({ project }: { project: Project }) {
 			className="pointer-events-none sticky top-4 mx-auto hidden h-[calc(100dvh-8rem)] w-full max-w-[56rem] flex-col justify-center justify-self-center md:flex select-none"
 		>
 			<figure className="flex w-full flex-col items-center">
-				<div className={PROJECT_PREVIEW_FRAME_CLASS_NAME}>
+				<div
+					className={PROJECT_PREVIEW_FRAME_CLASS_NAME}
+					style={{
+						aspectRatio: previewAspectRatio,
+						maxWidth: maxPreviewWidth,
+					}}
+				>
 					{shouldPlayVideo ? (
 						<video
 							key={previewSrc}
