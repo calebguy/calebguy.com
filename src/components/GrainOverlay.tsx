@@ -15,8 +15,8 @@ const fragmentShader = `
   uniform float u_grainScale;
   uniform float u_grainIntensity;
   uniform float u_seed;
-  uniform vec2 u_dragPos;
-  uniform float u_isDragging;
+  uniform vec2 u_pointerPos;
+  uniform float u_isPointerActive;
 
   float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -29,11 +29,11 @@ const fragmentShader = `
     vec2 grainUV = uv;
     float extraDistortion = 0.0;
 
-    if (u_isDragging > 0.001) {
-      float dragDist = distance(uv, u_dragPos);
+    if (u_isPointerActive > 0.001) {
+      float pointerDist = distance(uv, u_pointerPos);
       float maxRadius = 1000.0;
-      float ripple = sin(dragDist * 0.015 - t * 4.0) * 0.2;
-      float normalizedDist = dragDist / maxRadius;
+      float ripple = sin(pointerDist * 0.015 - t * 4.0) * 0.2;
+      float normalizedDist = pointerDist / maxRadius;
       float fadeOut = 1.0 - smoothstep(0.0, 1.0, normalizedDist);
 
       extraDistortion = ripple * fadeOut;
@@ -57,10 +57,9 @@ const fragmentShader = `
   }
 `;
 
-export interface DragPosition {
+export interface PointerPosition {
 	x: number;
 	y: number;
-	isDragging: boolean;
 }
 
 function createShader(
@@ -81,7 +80,7 @@ function createShader(
 }
 
 interface GrainOverlayProps {
-	dragPosition: DragPosition | null;
+	pointerPosition: PointerPosition | null;
 	className?: string;
 	resizeMode?: "viewport" | "element";
 	grainScale?: number;
@@ -89,32 +88,32 @@ interface GrainOverlayProps {
 }
 
 export default function GrainOverlay({
-	dragPosition,
+	pointerPosition,
 	className = "fixed inset-0 pointer-events-none mix-blend-overlay",
 	resizeMode = "viewport",
 	grainScale: grainScaleProp,
 	grainIntensity: grainIntensityProp,
 }: GrainOverlayProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const dragDataRef = useRef({
+	const pointerDataRef = useRef({
 		pos: [0, 0] as [number, number],
-		isDragging: false,
+		isActive: false,
 	});
 
 	useEffect(() => {
-		if (!dragPosition) {
-			dragDataRef.current.isDragging = false;
+		if (!pointerPosition) {
+			pointerDataRef.current.isActive = false;
 			return;
 		}
 
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-		dragDataRef.current.pos = [
-			dragPosition.x * dpr,
-			(window.innerHeight - dragPosition.y) * dpr,
+		pointerDataRef.current.pos = [
+			pointerPosition.x * dpr,
+			(window.innerHeight - pointerPosition.y) * dpr,
 		];
-		dragDataRef.current.isDragging = dragPosition.isDragging;
-	}, [dragPosition]);
+		pointerDataRef.current.isActive = true;
+	}, [pointerPosition]);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -150,8 +149,11 @@ export default function GrainOverlay({
 			"u_grainIntensity",
 		);
 		const seedLocation = gl.getUniformLocation(program, "u_seed");
-		const dragPosLocation = gl.getUniformLocation(program, "u_dragPos");
-		const isDraggingLocation = gl.getUniformLocation(program, "u_isDragging");
+		const pointerPosLocation = gl.getUniformLocation(program, "u_pointerPos");
+		const isPointerActiveLocation = gl.getUniformLocation(
+			program,
+			"u_isPointerActive",
+		);
 
 		const grainScale = grainScaleProp ?? 1 + Math.random() * 10;
 		const grainIntensity = grainIntensityProp ?? 0.15 + Math.random() * 0.15;
@@ -209,9 +211,9 @@ export default function GrainOverlay({
 			gl.uniform1f(grainIntensityLocation, grainIntensity);
 			gl.uniform1f(seedLocation, seed);
 
-			const dragData = dragDataRef.current;
-			gl.uniform2f(dragPosLocation, dragData.pos[0], dragData.pos[1]);
-			gl.uniform1f(isDraggingLocation, dragData.isDragging ? 1.0 : 0.0);
+			const pointerData = pointerDataRef.current;
+			gl.uniform2f(pointerPosLocation, pointerData.pos[0], pointerData.pos[1]);
+			gl.uniform1f(isPointerActiveLocation, pointerData.isActive ? 1.0 : 0.0);
 
 			gl.drawArrays(gl.TRIANGLES, 0, 6);
 			animationId = requestAnimationFrame(render);

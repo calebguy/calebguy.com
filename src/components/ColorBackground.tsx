@@ -1,5 +1,8 @@
-import { type ReactNode, useEffect, useRef, useState } from "react";
-import GrainOverlay, { type DragPosition } from "./GrainOverlay";
+import { type PointerEvent, type ReactNode, useEffect, useState } from "react";
+import GrainOverlay, { type PointerPosition } from "./GrainOverlay";
+
+const FULL_HUE_ROTATION = 360;
+const MAX_SATURATION = 100;
 
 function readStoredNumber(key: string, fallback: number) {
 	const stored = localStorage.getItem(key);
@@ -14,14 +17,9 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 	const [saturation, setSaturation] = useState(() =>
 		readStoredNumber("bgSaturation", 0),
 	);
-	const [dragPosition, setDragPosition] = useState<DragPosition | null>(null);
-
-	const touchStart = useRef<{
-		x: number;
-		y: number;
-		hue: number;
-		saturation: number;
-	} | null>(null);
+	const [pointerPosition, setPointerPosition] = useState<PointerPosition | null>(
+		null,
+	);
 
 	useEffect(() => {
 		const timeoutId = window.setTimeout(() => {
@@ -74,85 +72,22 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 		);
 	}, [hue, saturation]);
 
-	const handleTouchStart = (e: React.TouchEvent) => {
-		const touch = e.touches[0];
-		touchStart.current = {
-			x: touch.clientX,
-			y: touch.clientY,
-			hue,
-			saturation,
-		};
-	};
+	function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+		if (!event.isPrimary) return;
 
-	const handleTouchMove = (e: React.TouchEvent) => {
-		if (!touchStart.current) return;
-		const touch = e.touches[0];
-		const deltaX = touch.clientX - touchStart.current.x;
-		const deltaY = touch.clientY - touchStart.current.y;
+		const viewportWidth = Math.max(window.innerWidth, 1);
+		const viewportHeight = Math.max(window.innerHeight, 1);
+		const xProgress = Math.min(1, Math.max(0, event.clientX / viewportWidth));
+		const yProgress = Math.min(1, Math.max(0, event.clientY / viewportHeight));
 
-		const newHue =
-			(touchStart.current.hue + (deltaX / window.innerWidth) * 360 + 360) % 360;
-		setHue(Math.round(newHue));
+		setHue(Math.round(xProgress * FULL_HUE_ROTATION) % FULL_HUE_ROTATION);
+		setSaturation(Math.round(MAX_SATURATION - yProgress * MAX_SATURATION));
+		setPointerPosition({ x: event.clientX, y: event.clientY });
+	}
 
-		const newSaturation = Math.max(
-			0,
-			Math.min(
-				100,
-				touchStart.current.saturation - (deltaY / window.innerHeight) * 100,
-			),
-		);
-		setSaturation(Math.round(newSaturation));
-
-		setDragPosition({
-			x: touch.clientX,
-			y: touch.clientY,
-			isDragging: true,
-		});
-	};
-
-	const handleTouchEnd = () => {
-		touchStart.current = null;
-		setDragPosition(null);
-	};
-
-	const handleMouseDown = (e: React.MouseEvent) => {
-		touchStart.current = {
-			x: e.clientX,
-			y: e.clientY,
-			hue,
-			saturation,
-		};
-	};
-
-	const handleMouseMove = (e: React.MouseEvent) => {
-		if (!touchStart.current) return;
-		const deltaX = e.clientX - touchStart.current.x;
-		const deltaY = e.clientY - touchStart.current.y;
-
-		const newHue =
-			(touchStart.current.hue + (deltaX / window.innerWidth) * 360 + 360) % 360;
-		setHue(Math.round(newHue));
-
-		const newSaturation = Math.max(
-			0,
-			Math.min(
-				100,
-				touchStart.current.saturation - (deltaY / window.innerHeight) * 100,
-			),
-		);
-		setSaturation(Math.round(newSaturation));
-
-		setDragPosition({
-			x: e.clientX,
-			y: e.clientY,
-			isDragging: true,
-		});
-	};
-
-	const handleMouseUp = () => {
-		touchStart.current = null;
-		setDragPosition(null);
-	};
+	function handlePointerLeave() {
+		setPointerPosition(null);
+	}
 
 	return (
 		<>
@@ -160,16 +95,11 @@ export default function ColorBackground({ children }: { children: ReactNode }) {
 				className="fixed inset-0"
 				style={{ backgroundColor: `hsl(${hue}, ${saturation}%, 50%)` }}
 			/>
-			<GrainOverlay dragPosition={dragPosition} />
+			<GrainOverlay pointerPosition={pointerPosition} />
 			<div
-				className="relative min-h-screen touch-none"
-				onTouchStart={handleTouchStart}
-				onTouchMove={handleTouchMove}
-				onTouchEnd={handleTouchEnd}
-				onMouseDown={handleMouseDown}
-				onMouseMove={handleMouseMove}
-				onMouseUp={handleMouseUp}
-				onMouseLeave={handleMouseUp}
+				className="relative min-h-screen"
+				onPointerMove={handlePointerMove}
+				onPointerLeave={handlePointerLeave}
 			>
 				{children}
 			</div>

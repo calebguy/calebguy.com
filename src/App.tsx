@@ -1,30 +1,24 @@
 import {
 	type AnchorHTMLAttributes,
+	Fragment,
 	type MouseEvent,
-	type ReactNode,
-	useState,
 	useSyncExternalStore,
 } from "react";
 import ColorBackground from "./components/ColorBackground";
 import GrainOverlay from "./components/GrainOverlay";
 
 const NAVIGATION_EVENT = "calebguy:navigate";
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-const VIDEO_PREVIEW_PATTERN = /\.(mp4|webm|ogg|mov)(?:[?#].*)?$/i;
-const MOTION_IMAGE_PREVIEW_PATTERN = /\.(gif|apng)(?:[?#].*)?$/i;
-const PROJECT_PREVIEW_FRAME_CLASS_NAME = "w-full overflow-hidden rounded-3xl";
-const DEFAULT_PROJECT_PREVIEW_ASPECT_RATIO = 4 / 5;
-const MAX_PROJECT_PREVIEW_HEIGHT_DVH = 70;
-const PROJECT_PREVIEW_MEDIA_CLASS_NAME = "h-full w-full object-cover";
 
 interface Project {
 	name: string;
 	url: string;
 	year: number;
 	description: string;
-	previewSrc?: string;
-	previewPosterSrc?: string;
-	previewAspectRatio?: number;
+}
+
+interface ProjectYearGroup {
+	year: number;
+	projects: Project[];
 }
 
 const projects: Project[] = [
@@ -32,100 +26,88 @@ const projects: Project[] = [
 		name: "ascii goggles",
 		url: "https://asciigoggles.calebguy.com",
 		year: 2026,
-		description: "life in ascii",
-		previewSrc: "/projects/ascii-goggles-preview.mp4",
-		previewPosterSrc: "/projects/ascii-goggles-poster.jpg",
+		description: "life in asciiiiiiii",
 	},
 	{
 		name: "writer",
 		url: "https://writer.place/",
 		year: 2025,
-		description: "write today, forever",
-		previewSrc: "/projects/writer-preview.mp4",
-		previewPosterSrc: "/projects/writer-poster.jpg",
+		description: "write your diary in a rock",
 	},
 	{
 		name: "nebula",
 		url: "https://nebula-kappa-rust.vercel.app/",
 		year: 2019,
-		description: "music video/video game",
-		previewSrc: "/projects/nebula-preview.mp4",
-		previewPosterSrc: "/projects/nebula-poster.jpg",
+		description: "music videovideo game",
 	},
 	{
 		name: "bloonnoise",
 		url: "https://youtu.be/yKZbCIlSwHc",
 		year: 2019,
-		description: "playable balloons",
-		previewSrc: "/projects/bloonnoise-preview.mp4",
-		previewPosterSrc: "/projects/bloonnoise-poster.jpg",
-		previewAspectRatio: 16 / 9,
+		description: "balloons",
 	},
 	{
 		name: "user",
 		url: "https://youtu.be/NBI_6D5yV3c",
 		year: 2019,
-		description: "interactive phone fear factory",
-		previewSrc: "/projects/user-preview.mp4",
-		previewPosterSrc: "/projects/user-poster.jpg",
-		previewAspectRatio: 16 / 9,
+		description: "phone fear factory",
 	},
 	{
 		name: "decisions",
 		url: "https://decisions-navy.vercel.app/",
 		year: 2019,
-		description: "interactive path sculpture",
-		previewSrc: "/projects/decisions-preview.mp4",
-		previewPosterSrc: "/projects/decisions-poster.jpg",
+		description: "path sculpture",
+	},
+	{
+		name: "slurpy",
+		url: "https://youtu.be/ilZHbuH81FQ?si=Fh8OcVpKKVWPpvnK",
+		year: 2019,
+		description: "fall in love, get slurped",
+	},
+	{
+		name: "wordplay",
+		url: "https://youtu.be/hAwZb4hvRwg?si=F0UC0WmlNBtc1g93",
+		year: 2019,
+		description: "playing with _-_-_-_-_",
 	},
 	{
 		name: "painthead",
 		url: "https://painthead.vercel.app/",
 		year: 2018,
-		description: "online yelling installation",
-		previewSrc: "/projects/painthead.jpg",
+		description: "yelling exhibition",
+	},
+	{
+		name: "understanding nothing",
+		url: "https://youtu.be/buCZf7gC-sw?si=ut4EZWxmxANMOXvB",
+		year: 2018,
+		description: "hmmmm",
+	},
+	{
+		name: "I♥︎",
+		url: "https://youtu.be/gwVnfZQI8EU?si=JVYg9ObFkTZK1V87",
+		year: 2018,
+		description: "my computer",
 	},
 ];
 
-const jobProjects: Project[] = [
-	{
-		name: "slack.tips",
-		url: "https://slack.tips",
-		year: 2025,
-		description: "onchain slack tips",
-	},
-	{
-		name: "ethcall.org",
-		url: "https://ethcall.org",
-		year: 2025,
-		description: "http eth_call",
-	},
-	{
-		name: "e+",
-		url: "/e+",
-		year: 2022,
-		description: "internet image curation",
-	},
-	{
-		name: "wanwan",
-		url: "https://wanwan-roan.vercel.app/",
-		year: 2022,
-		description: "meme competitions for communities",
-	},
-	{
-		name: "doge pixels",
-		url: "https://pixels.ownthedoge.com/",
-		year: 2021,
-		description: "pixels of Kabosu",
-	},
-];
+function groupProjectsByYear(projects: readonly Project[]) {
+	const groups: ProjectYearGroup[] = [];
 
-const images = [
-	{ src: "/e+/flows.png", alt: "user flows" },
-	{ src: "/e+/e1.png", alt: "e+ screenshot 1" },
-	{ src: "/e+/e2.png", alt: "grid view" },
-	{ src: "/e+/entropy-the-second-law.png", alt: "upload" },
-];
+	for (const project of projects) {
+		const previousGroup = groups[groups.length - 1];
+
+		if (previousGroup?.year === project.year) {
+			previousGroup.projects.push(project);
+			continue;
+		}
+
+		groups.push({ year: project.year, projects: [project] });
+	}
+
+	return groups;
+}
+
+const projectYearGroups = groupProjectsByYear(projects);
 
 function getPathname() {
 	const pathname = window.location.pathname || "/";
@@ -149,24 +131,6 @@ function subscribeToNavigation(callback: () => void) {
 
 function usePathname() {
 	return useSyncExternalStore(subscribeToNavigation, getPathname, () => "/");
-}
-
-
-function subscribeToReducedMotion(callback: () => void) {
-	const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);
-	mediaQuery.addEventListener("change", callback);
-
-	return () => {
-		mediaQuery.removeEventListener("change", callback);
-	};
-}
-
-function usePrefersReducedMotion() {
-	return useSyncExternalStore(
-		subscribeToReducedMotion,
-		() => window.matchMedia(REDUCED_MOTION_QUERY).matches,
-		() => false,
-	);
 }
 
 function navigate(href: string) {
@@ -210,257 +174,85 @@ function Link({ href, onClick, target, children, ...props }: LinkProps) {
 	);
 }
 
-function WorkSummary() {
-	return (
-		<div className="flex w-full flex-col text-3xl md:text-6xl leading-snug select-none">
-			<span>
-				<span className="text-white opacity-65">current: </span>
-				<a
-					href="https://www.cloudflare.com/"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
-					style={{ color: "var(--text-color)" }}
-				>
-					cloudflare
-				</a>
-			</span>
-			<span>
-				<span className="text-white opacity-65">previous: </span>
-				<a
-					href="https://syndicate.io/"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
-					style={{ color: "var(--text-color)" }}
-				>
-					syndicate
-				</a>
-				<span className="text-white opacity-65">, </span>
-				<a
-					href="https://www.ownthedoge.com/"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
-					style={{ color: "var(--text-color)" }}
-				>
-					ownthedoge
-				</a>
-				<span className="text-white opacity-65">, </span>
-				<a
-					href="https://rocketreach.co/iterative-capital-management-profile_b45c78d0fc6e8eaa"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
-					style={{ color: "var(--text-color)" }}
-				>
-					an otc desk
-				</a>
-			</span>
-			<span aria-hidden="true" className="work-separator mt-4 mb-4">
-				<GrainOverlay
-					dragPosition={null}
-					resizeMode="element"
-					grainScale={14}
-					grainIntensity={0.38}
-					className="absolute inset-0 h-full w-full pointer-events-none mix-blend-overlay"
-				/>
-			</span>
-		</div>
-	);
-}
-
 interface ProjectLinkProps {
 	project: Project;
-	isPreviewActive?: boolean;
-	onPreviewDismiss?: () => void;
-	onPreviewRequest?: () => void;
 }
 
-function ProjectLink({
-	project,
-	isPreviewActive = false,
-	onPreviewDismiss,
-	onPreviewRequest,
-}: ProjectLinkProps) {
+function ProjectLink({ project }: ProjectLinkProps) {
 	const linkTargetProps = project.url.startsWith("http")
 		? { target: "_blank", rel: "noopener noreferrer" }
 		: {};
-	const activeClassName = isPreviewActive ? " md:font-bold" : "";
 
 	return (
-		<Link
-			key={project.name}
-			{...linkTargetProps}
-			href={project.url}
-			aria-label={`${project.name}: ${project.description}`}
-			onFocus={onPreviewRequest}
-			onBlur={onPreviewDismiss}
-			onMouseEnter={onPreviewRequest}
-			onMouseLeave={onPreviewDismiss}
-			className={`text-3xl md:text-6xl font-normal md:hover:font-bold leading-snug transition-colors hover:text-(--text-color-hover)! select-none group flex flex-col md:flex-row md:gap-2${activeClassName}`}
+		<div
+			className="block leading-snug select-none"
 			style={{
 				color: "var(--text-color)",
 				fontFamily: "'Merchant Copy', monospace",
 			}}
 		>
-			{project.name}
-			<span className="text-xl md:text-3xl md:hidden opacity-65 text-white">
-				<span className="italic">({project.year})</span> {project.description}
+			<Link
+				{...linkTargetProps}
+				href={project.url}
+				aria-label={`${project.name}: ${project.description}`}
+				className="inline text-2xl md:text-4xl font-normal md:hover:font-bold hover:text-(--text-color-hover)! md:whitespace-nowrap"
+			>
+				{project.name}
+			</Link>
+			<span className="block md:inline md:ml-2 text-xl md:text-2xl opacity-65 text-white">
+				{project.description}
 			</span>
-		</Link>
+		</div>
 	);
 }
 
-function ProjectPreview({ project }: { project: Project }) {
-	const prefersReducedMotion = usePrefersReducedMotion();
-	const previewSrc = project.previewSrc;
-
-	if (!previewSrc) {
-		return null;
-	}
-
-	const isVideoPreview = VIDEO_PREVIEW_PATTERN.test(previewSrc);
-	const hasMotionImagePreview = MOTION_IMAGE_PREVIEW_PATTERN.test(previewSrc);
-	const shouldUsePosterImage =
-		prefersReducedMotion &&
-		Boolean(project.previewPosterSrc) &&
-		(isVideoPreview || hasMotionImagePreview);
-	const shouldPlayVideo = isVideoPreview && !prefersReducedMotion;
-	const imagePreviewSrc =
-		shouldUsePosterImage && project.previewPosterSrc
-			? project.previewPosterSrc
-			: previewSrc;
-	const previewAspectRatio =
-		project.previewAspectRatio ?? DEFAULT_PROJECT_PREVIEW_ASPECT_RATIO;
-	const maxPreviewWidth = `${MAX_PROJECT_PREVIEW_HEIGHT_DVH * previewAspectRatio}dvh`;
-
+function YearDivider() {
 	return (
-		<aside
-			aria-hidden="true"
-			className="pointer-events-none sticky top-4 mx-auto hidden h-[calc(100dvh-8rem)] w-full max-w-[56rem] flex-col justify-center justify-self-center md:flex select-none"
+		<span aria-hidden="true" className="work-separator">
+			<GrainOverlay
+				pointerPosition={null}
+				resizeMode="element"
+				grainScale={14}
+				grainIntensity={0.38}
+				className="absolute inset-0 h-full w-full pointer-events-none mix-blend-overlay"
+			/>
+		</span>
+	);
+}
+
+function ProjectLinks({ groups }: { groups: readonly ProjectYearGroup[] }) {
+	return (
+		<section
+			id="content"
+			className="flex max-h-dvh flex-col items-start gap-2 overflow-y-auto"
 		>
-			<figure className="flex w-full flex-col items-center">
-				<div
-					className={PROJECT_PREVIEW_FRAME_CLASS_NAME}
-					style={{
-						aspectRatio: previewAspectRatio,
-						maxWidth: maxPreviewWidth,
-					}}
-				>
-					{shouldPlayVideo ? (
-						<video
-							key={previewSrc}
-							src={previewSrc}
-							poster={project.previewPosterSrc}
-							autoPlay
-							muted
-							loop
-							playsInline
-							preload="auto"
-							className={PROJECT_PREVIEW_MEDIA_CLASS_NAME}
-						/>
-					) : isVideoPreview && !project.previewPosterSrc ? (
-						<video
-							key={previewSrc}
-							src={previewSrc}
-							muted
-							playsInline
-							preload="metadata"
-							className={PROJECT_PREVIEW_MEDIA_CLASS_NAME}
-						/>
-					) : (
-						<img
-							src={imagePreviewSrc}
-							alt=""
-							className={PROJECT_PREVIEW_MEDIA_CLASS_NAME}
-						/>
-					)}
-				</div>
-				<figcaption
-					className="mt-3 flex flex-col items-center text-center lowercase"
-					style={{
-						color: "var(--text-color)",
-						fontFamily: "'Merchant Copy', monospace",
-					}}
-				>
-					<span className="text-2xl opacity-65 text-white">
-						<span className="italic">{project.year}::</span>
-						{project.description}
-					</span>
-				</figcaption>
-			</figure>
-		</aside>
-	);
-}
-
-function ProjectLinks({
-	projects,
-	summary,
-}: {
-	projects: Project[];
-	summary?: ReactNode;
-}) {
-	const previewProjects = projects.filter((project) => project.previewSrc);
-	const [activeProjectName, setActiveProjectName] = useState<string | null>(
-		null,
-	);
-	const activePreviewProject =
-		previewProjects.find((project) => project.name === activeProjectName) ??
-		null;
-	const hasProjectPreviews = previewProjects.length > 0;
-	const sectionClassName = hasProjectPreviews
-		? "grid max-h-dvh grid-cols-1 gap-6 overflow-y-auto md:grid-cols-[minmax(24rem,44rem)_minmax(24rem,1fr)] md:items-start md:gap-12"
-		: "flex max-h-dvh flex-col items-center gap-6 overflow-y-auto";
-
-	return (
-		<section id="content" className={sectionClassName}>
-			{summary}
-			<div className="flex w-full flex-col items-start">
-				{projects.map((project) => (
-					<ProjectLink
-						key={project.name}
-						project={project}
-						isPreviewActive={project.name === activePreviewProject?.name}
-						onPreviewDismiss={
-							project.previewSrc
-								? () =>
-										setActiveProjectName((currentProjectName) =>
-											currentProjectName === project.name
-												? null
-												: currentProjectName,
-										)
-								: undefined
-						}
-						onPreviewRequest={
-							project.previewSrc
-								? () => setActiveProjectName(project.name)
-								: () => setActiveProjectName(null)
-						}
-					/>
-				))}
-			</div>
-			{activePreviewProject ? (
-				<ProjectPreview project={activePreviewProject} />
-			) : null}
+			{groups.map((group, index) => (
+				<Fragment key={group.year}>
+					<section className="flex flex-col items-start">
+						<h2 className="text-xl md:text-2xl leading-snug select-none text-white opacity-65">
+							{group.year}
+						</h2>
+						<div className="flex flex-col items-start gap-4">
+							{group.projects.map((project) => (
+								<ProjectLink key={project.name} project={project} />
+							))}
+						</div>
+					</section>
+					{index < groups.length - 1 ? <YearDivider /> : null}
+				</Fragment>
+			))}
 		</section>
 	);
 }
 
-function ThingsPage({
-	projects,
-	summary,
-}: {
-	projects: Project[];
-	summary?: ReactNode;
-}) {
+function Things() {
 	return (
 		<>
-			<ProjectLinks projects={projects} summary={summary} />
+			<ProjectLinks groups={projectYearGroups} />
 
 			<Link
 				href="/"
-				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+				className="fixed bottom-4 right-4 text-2xl md:text-4xl leading-snug select-none md:hover:font-bold hover:text-(--text-color-hover)!"
 				style={{
 					color: "var(--text-color)",
 					fontFamily: "'Merchant Copy', monospace",
@@ -472,27 +264,19 @@ function ThingsPage({
 	);
 }
 
-function Things() {
-	return <ThingsPage projects={projects} />;
-}
-
-function ThingsIMadeForAJob() {
-	return <ThingsPage projects={jobProjects} summary={<WorkSummary />} />;
-}
-
 function Blank() {
 	return (
 		<>
-			<ProjectLinks projects={projects} />
+			<ProjectLinks groups={projectYearGroups} />
 			<Link
 				href="/about"
-				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+				className="fixed bottom-4 right-4 text-2xl md:text-4xl leading-snug select-none md:hover:font-bold hover:text-(--text-color-hover)!"
 				style={{
 					color: "var(--text-color)",
 					fontFamily: "'Merchant Copy', monospace",
 				}}
 			>
-				calebguy
+				&gt;&gt;
 			</Link>
 		</>
 	);
@@ -503,7 +287,7 @@ function About() {
 		<div className="flex flex-col items-start justify-between min-h-screen">
 			<div
 				id="content"
-				className="flex flex-col items-start gap-2 text-3xl md:text-6xl leading-snug select-none"
+				className="flex flex-col items-start gap-2 text-2xl md:text-4xl leading-snug select-none"
 				style={{
 					color: "var(--text-color)",
 					fontFamily: "'Merchant Copy', monospace",
@@ -513,7 +297,7 @@ function About() {
 					href="https://github.com/calebguy"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
+					className="hover:text-(--text-color-hover)! md:hover:font-bold"
 				>
 					gh
 				</a>
@@ -521,7 +305,7 @@ function About() {
 					href="https://www.instagram.com/caleb__guy/"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
+					className="hover:text-(--text-color-hover)! md:hover:font-bold"
 				>
 					insta
 				</a>
@@ -529,71 +313,20 @@ function About() {
 					href="https://x.com/caleb__guy"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="transition-colors hover:text-(--text-color-hover)! md:hover:font-bold"
+					className="hover:text-(--text-color-hover)! md:hover:font-bold"
 				>
 					x
 				</a>
 			</div>
 			<Link
 				href="/"
-				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
+				className="fixed bottom-4 right-4 text-2xl md:text-4xl leading-snug select-none md:hover:font-bold hover:text-(--text-color-hover)!"
 				style={{
 					color: "var(--text-color)",
 					fontFamily: "'Merchant Copy', monospace",
 				}}
 			>
-				/
-			</Link>
-		</div>
-	);
-}
-
-function EPlus() {
-	return (
-		<div className="flex min-h-dvh flex-col p-4 pb-24">
-			<header className="mb-8">
-				<div className="flex items-center gap-4">
-					<h1 className="text-3xl md:text-6xl leading-snug select-none">e+</h1>
-				</div>
-				<p className="text-xl md:text-3xl mt-4 opacity-65 text-white">
-					Frontend build for{" "}
-					<a
-						href="https://x.com/ennntropy"
-						className="text-xl md:text-3xl mt-4 opacity-65 md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						@ennntropy
-					</a>
-					{"'s "}
-					e+, an internet image curation platform.
-				</p>
-			</header>
-
-			<section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-w-screen-lg mx-auto">
-				{images.map((image) => (
-					<div
-						key={image.src}
-						className="relative w-full h-auto flex items-center justify-center"
-					>
-						<img
-							src={image.src}
-							alt={image.alt}
-							width={1200}
-							height={800}
-							loading="lazy"
-							className="w-full h-auto rounded-lg"
-							style={{ objectFit: "contain" }}
-						/>
-					</div>
-				))}
-			</section>
-
-			<Link
-				href="/things-i-made-for-a-job"
-				className="fixed bottom-4 right-4 text-3xl md:text-6xl leading-snug select-none md:hover:font-bold transition-colors hover:text-(--text-color-hover)!"
-			>
-				work
+				&lt;&lt;
 			</Link>
 		</div>
 	);
@@ -607,10 +340,6 @@ function Route({ pathname }: { pathname: string }) {
 			return <About />;
 		case "/things-i-made-for-me-and-care-about":
 			return <Things />;
-		case "/things-i-made-for-a-job":
-			return <ThingsIMadeForAJob />;
-		case "/e+":
-			return <EPlus />;
 		default:
 			return <About />;
 	}

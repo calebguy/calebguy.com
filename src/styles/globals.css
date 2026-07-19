@@ -48,6 +48,7 @@ body {
 }
 
 #content {
+  overflow-x: hidden;
   padding: 1rem;
   padding-top: calc(1rem + env(safe-area-inset-top));
   padding-bottom: calc(4rem + env(safe-area-inset-bottom));
@@ -58,9 +59,10 @@ body {
 .work-separator {
   position: relative;
   display: block;
+  flex-shrink: 0;
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  height: 50px;
+  height: 36px;
   overflow: hidden;
   background: var(--separator-color);
 }
