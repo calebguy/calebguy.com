@@ -89,7 +89,7 @@ const projects: Project[] = [
 		description: "my computer",
 	},
 	{
-		name: "Space B_W ME",
+		name: "space b_w me",
 		url: "https://youtu.be/EiYRrbmrIYc?si=xboWuLT5JKheijqj",
 		year: 2017,
 		description: "beep....beeeep",
