@@ -88,6 +88,12 @@ const projects: Project[] = [
 		year: 2018,
 		description: "my computer",
 	},
+	{
+		name: "Space B_W ME",
+		url: "https://youtu.be/EiYRrbmrIYc?si=xboWuLT5JKheijqj",
+		year: 2017,
+		description: "beep....beeeep",
+	},
 ];
 
 function groupProjectsByYear(projects: readonly Project[]) {
@@ -229,7 +235,7 @@ function ProjectLinks({ groups }: { groups: readonly ProjectYearGroup[] }) {
 			{groups.map((group, index) => (
 				<Fragment key={group.year}>
 					<section className="flex flex-col items-start">
-						<h2 className="text-xl md:text-2xl leading-snug select-none text-white opacity-65">
+						<h2 className="mb-1 text-xl md:text-2xl leading-snug select-none text-white opacity-65">
 							{group.year}
 						</h2>
 						<div className="flex flex-col items-start gap-4">
@@ -276,7 +282,7 @@ function Blank() {
 					fontFamily: "'Merchant Copy', monospace",
 				}}
 			>
-				&gt;&gt;
+				-&gt;
 			</Link>
 		</>
 	);
@@ -326,7 +332,7 @@ function About() {
 					fontFamily: "'Merchant Copy', monospace",
 				}}
 			>
-				&lt;&lt;
+				&lt;-
 			</Link>
 		</div>
 	);
