@@ -21,7 +21,13 @@ interface ProjectYearGroup {
 	projects: Project[];
 }
 
-const projects: Project[] = [
+const projects: readonly Project[] = [
+	{
+		name: "30shirts",
+		url: "https://30shirts.cc/",
+		year: 2026,
+		description: "for30years",
+	},
 	{
 		name: "ascii goggles",
 		url: "https://asciigoggles.calebguy.com",
